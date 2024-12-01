@@ -1,20 +1,23 @@
-# Dependencias
+# Ignorar el archivo comprimido
+*.rar
+
+# Ignorar dependencias de Node.js
 node_modules/
 
-# Variables de entorno
+# Ignorar archivos de entorno
 .env
 
-# Archivos de logs
-*.log
+# Ignorar carpetas de construcción (si las tienes)
+dist/
+build/
 
-# Configuración de sistemas operativos
+# Ignorar configuraciones específicas de sistemas operativos
 .DS_Store
 Thumbs.db
 
+# Ignorar logs
+*.log
 
-# Ignorar archivos de compresión
-*.rar
-
-# Ignorar todos los archivos en esta carpeta actual
-./
-
+# Ignorar backups o configuraciones innecesarias
+*.bak
+*.tmp
