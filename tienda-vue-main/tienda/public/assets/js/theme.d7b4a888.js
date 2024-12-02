@@ -492,6 +492,7 @@ $(function () {
     objectFitImages();
 });
 
+
 export const init_carousel={
     init:function(){
         setTimeout(()=>{

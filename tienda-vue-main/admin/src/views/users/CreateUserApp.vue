@@ -90,16 +90,16 @@
 
 <script>
 // @ is an alias to /src
-import AsideApp from "@/components/AsideApp.vue";
-import TopApp from '@/components/TopApp.vue';
+import Sidebar from "@/components/Sidebar.vue";
+import TopBar from '@/components/TopBar.vue';
 import axios from "axios";
 
 
 export default {
   name: 'CreateUserApp',
   components: {
-    AsideApp,
-    TopApp
+    Sidebar,
+    TopBar
   }, 
   data() {
       return {

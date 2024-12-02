@@ -1,102 +1,124 @@
 <template>
-    <nav class="navbar navbar-vertical fixed-start navbar-expand-md navbar-dark navbar-vibrant" id="sidebar">
-      <div class="container-fluid">
+  <nav class="navbar navbar-vertical fixed-start navbar-expand-md navbar-light" id="sidebar">
+    <div class="container-fluid">
   
-        <!-- Toggler -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarCollapse"
-          aria-controls="sidebarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+      <!-- Toggler -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarCollapse" aria-controls="sidebarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
   
-        <!-- Brand -->
-        <a class="navbar-brand" href="./index.html">
-          <img src="/assets/img/logo.svg" class="navbar-brand-img mx-auto" alt="...">
-        </a>
+      <!-- Brand -->
+      <a class="navbar-brand" href="./index.html">
+        <img src="/assets/img/logo.svg" class="navbar-brand-img mx-auto" alt="...">
+      </a>
   
-        <!-- User (xs) -->
-        <div class="navbar-user d-md-none">
+      <!-- User (xs) -->
+      <div class="navbar-user d-md-none">
   
-          <!-- Dropdown -->
-          <div class="dropdown">
+        <!-- Dropdown -->
+        <div class="dropdown">
   
-            <!-- Toggle -->
-            <a href="#" id="sidebarIcon" class="dropdown-toggle" role="button" data-bs-toggle="dropdown"
-              aria-haspopup="true" aria-expanded="false">
-              <div class="avatar avatar-sm avatar-online">
-                <img src="/assets/img/avatars/profiles/avatar-1.jpg" class="avatar-img rounded-circle" alt="...">
-              </div>
-            </a>
-  
-            <!-- Menu -->
-            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sidebarIcon">
-              <a href="./profile-posts.html" class="dropdown-item">Profile</a>
-              <a href="./account-general.html" class="dropdown-item">Settings</a>
-              <hr class="dropdown-divider">
-              <a href="./sign-in.html" class="dropdown-item">Logout</a>
+          <!-- Toggle -->
+          <a href="#" id="sidebarIcon" class="dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <div class="avatar avatar-sm avatar-online">
+              <img src="/assets/img/avatar-1.jpg" class="avatar-img rounded-circle" alt="..." style="-webkit-mask-image: none;">
             </div>
+          </a>
   
+          <!-- Menu -->
+          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sidebarIcon">
+            <a href="./profile-posts.html" class="dropdown-item">Profile</a>
+            <a href="./account-general.html" class="dropdown-item">Settings</a>
+            <hr class="dropdown-divider">
+            <a href="./sign-in.html" class="dropdown-item">Logout</a>
           </div>
   
         </div>
   
-        <!-- Collapse -->
-        <div class="collapse navbar-collapse" id="sidebarCollapse">
+      </div>
   
-          <!-- Form -->
-          <form class="mt-4 mb-3 d-md-none">
-            <div class="input-group input-group-rounded input-group-merge input-group-reverse">
-              <input class="form-control" type="search" placeholder="Search" aria-label="Search">
-              <div class="input-group-text">
-                <span class="fe fe-search"></span>
-              </div>
+      <!-- Collapse -->
+      <div class="collapse navbar-collapse" id="sidebarCollapse">
+  
+        <!-- Form -->
+        <form class="mt-4 mb-3 d-md-none">
+          <div class="input-group input-group-rounded input-group-merge input-group-reverse">
+            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+            <div class="input-group-text">
+              <span class="fe fe-search"></span>
             </div>
-          </form>
+          </div>
+        </form>
   
-          <!-- Navigation -->
-          <ul class="navbar-nav">
+        <!-- Navigation -->
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="#sidebarDashboards" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="sidebarDashboards">
+              <i class="fe fe-home"></i> Dashboards
+            </a>
+            <div class="collapse show" id="sidebarDashboards">
+              <ul class="nav nav-sm flex-column">
+                <li class="nav-item">
+                  <a href="./index.html" class="nav-link active">
+                    Default
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="./dashboard-project-management.html" class="nav-link ">
+                    Project Management
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="./dashboard-ecommerce.html" class="nav-link ">
+                    E-Commerce
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+       
+          <li class="nav-item">
+            <router-link to="/colaborador" class="nav-link" active-class="active">
+              <i class="fe fe-user"></i> Colaboradores
+            </router-link>
+          </li>
+         
+        </ul>
+
+        <hr class="navbar-divider my-3">
+        <h6 class="navbar-heading">
+          Control
+        </h6>
+
+        <ul class="navbar-nav mb-md-4">
             <li class="nav-item">
-              <a class="nav-link" href="#sidebarDashboards" data-bs-toggle="collapse" role="button" aria-expanded="true"
-                aria-controls="sidebarDashboards">
-                <i class="fe fe-home"></i> Dashboards
-              </a>
-              <div class="collapse show" id="sidebarDashboards">
-                <ul class="nav nav-sm flex-column">
-                  <li class="nav-item">
-                    <a href="./index.html" class="nav-link active">
-                      Default
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="./dashboard-project-management.html" class="nav-link ">
-                      Project Management
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="./dashboard-ecommerce.html" class="nav-link ">
-                      E-Commerce
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-            <li class="nav-item">
-              <router-link to="/colaborador/index" class="nav-link">
-                <i class="fe fe-user"></i> Colaboradores
-              </router-link>
-            </li>
-  
-          </ul>
+            <router-link to="/producto/create" class="nav-link" active-class="active">
+              <i class="fe fe-shopping-cart"></i> Productos
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/ingreso/create" class="nav-link" active-class="active">
+              <i class="fe fe-folder"></i> Ingreso
+            </router-link>
+          </li>
+
+          <li class="nav-item">
+            <router-link to="/ventas" class="nav-link" active-class="active">
+              <i class="fe fe-shopping-bag"></i> Ventas
+            </router-link>
+          </li>
+        </ul>
   
   
-          <!-- Push content down -->
-          <div class="mt-auto"></div>
+        <!-- Push content down -->
+        <div class="mt-auto"></div>
+  
   
           <!-- User (md) -->
           <div class="navbar-user d-none d-md-flex" id="sidebarUser">
   
             <!-- Icon -->
-            <a class="navbar-user-link" data-bs-toggle="offcanvas" href="#sidebarOffcanvasActivity"
-              aria-controls="sidebarOffcanvasActivity">
+            <a class="navbar-user-link" data-bs-toggle="offcanvas" href="#sidebarOffcanvasActivity" aria-controls="sidebarOffcanvasActivity">
               <span class="icon">
                 <i class="fe fe-bell"></i>
               </span>
@@ -106,11 +128,9 @@
             <div class="dropup">
   
               <!-- Toggle -->
-              <a href="#" id="sidebarIconCopy" class="dropdown-toggle" role="button" data-bs-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">
+              <a href="#" id="sidebarIconCopy" class="dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <div class="avatar avatar-sm avatar-online">
-                  <img src="/assets/img/avatar-1.jpg" class="avatar-img rounded-circle" alt="..."
-                    style="-webkit-mask-image:none ;">
+                  <img src="/assets/img/avatar-1.jpg" class="avatar-img rounded-circle" alt="..." style="-webkit-mask-image: none;">
                 </div>
               </a>
   
@@ -125,8 +145,7 @@
             </div>
   
             <!-- Icon -->
-            <a class="navbar-user-link" data-bs-toggle="offcanvas" href="#sidebarOffcanvasSearch"
-              aria-controls="sidebarOffcanvasSearch">
+            <a class="navbar-user-link" data-bs-toggle="offcanvas" href="#sidebarOffcanvasSearch" aria-controls="sidebarOffcanvasSearch">
               <span class="icon">
                 <i class="fe fe-search"></i>
               </span>
@@ -134,18 +153,15 @@
   
           </div>
   
-        </div> <!-- / .navbar-collapse -->
+      </div> <!-- / .navbar-collapse -->
   
-      </div>
-    </nav>
-  </template>
-  
-  <script>
-  export default {
-    name: 'Sidebar',
-    props: {
-      msg: String
-    }
-  }
-  </script>
-  
+    </div>
+  </nav>
+</template>
+
+<script>
+export default {
+name: 'Sidebar',
+}
+</script>
+

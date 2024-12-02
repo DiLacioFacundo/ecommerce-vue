@@ -6,7 +6,7 @@ const IngresoSchema = Schema({
     monto_total: { type: String, required: true }, //f
     serie: { type: Number, required: true }, //nf
     monto_resultante: { type: String, required: true }, //nf
-    usuario: { type: Schema.ObjectId, ref: 'usuarioC', required: true }, //nf
+    usuario: { type: Schema.ObjectId, ref: 'usuarios', required: true }, //nf
 
     createdAt: { type: Date, default: Date.now }
 });

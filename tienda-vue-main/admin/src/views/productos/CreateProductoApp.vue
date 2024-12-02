@@ -166,8 +166,7 @@
                                         </label>
 
                                         <!-- Input -->
-                                        <input type="number" class="form-control" placeholder="Precio"
-                                            v-model="producto.precio">
+                                        <input  disabled type="number" class="form-control" placeholder="Precio">
 
                                     </div>
 

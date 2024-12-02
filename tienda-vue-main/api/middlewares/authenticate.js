@@ -2,27 +2,32 @@ var jwt = require('jwt-simple');
 var moment = require('moment');
 var secret = 'diego';
 
-exports.decodeToken = function(req,res,next){
-    if(!req.headers.authorization){
-        return res.status(403).send({message:'NoHeadersErrors'});
+exports.decodeToken = function(req, res, next) {
+    if (!req.headers.authorization) {
+        return res.status(403).send({ message: 'NoHeadersErrors' });
     }
 
     var token = req.headers.authorization;
-    var segment = token.split('.')
 
-    if(segment.length !=3){
-        return res.status(403).send({message:'InvalidToken'});
-    }else{
-        try {
-            var payload = jwt.decode(token,secret);
-            console.log(payload);
-        } catch (error) {
-            console.log(error);
-            return res.status(403).send({message:'ErrorToken'});
-
-        }
+    // Verificar formato del token
+    var segments = token.split('.');
+    if (segments.length !== 3) {
+        return res.status(403).send({ message: 'InvalidToken' });
     }
 
-    req.user = payload;
-    next();
-}
+    try {
+        // Decodificar el token
+        var payload = jwt.decode(token, secret);
+
+        // Verificar expiración
+        if (payload.exp <= moment().unix()) {
+            return res.status(403).send({ message: 'TokenExpired' });
+        }
+
+        req.user = payload; // Asignar el payload al objeto `req`
+        next(); // Continuar con la siguiente función
+    } catch (error) {
+        console.log('Error decoding token:', error);
+        return res.status(403).send({ message: 'ErrorToken' });
+    }
+};

@@ -1,25 +1,31 @@
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
-import Notifications from 'vue-notification'
+// Importaciones globales
+import Vue from 'vue';
+import App from './App.vue';
+import router from './router';
+import store from './store';
+import Notifications from 'vue-notification';
+import VuePaginate from 'vue-paginate'
+import { BootstrapVue, IconsPlugin, ModalPlugin } from 'bootstrap-vue';
+// Bootstrap y BootstrapVue
+import 'vue-search-select/dist/VueSearchSelect.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
 
-import { BootstrapVue } from 'bootstrap-vue'
-import { ModalPlugin } from 'bootstrap-vue'
 
+// Configuración global
+Vue.config.productionTip = false;
+Vue.prototype.$url = 'http://localhost:4201/api';
+Vue.prototype.$token = localStorage.getItem('token');
 
-// Import Bootstrap and BootstrapVue CSS files (order is important)
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+// Uso de plugins
+Vue.use(Notifications);
+Vue.use(BootstrapVue);
+Vue.use(ModalPlugin);
+Vue.use(VuePaginate);
+Vue.use(IconsPlugin);
 
-Vue.config.productionTip = false
-Vue.prototype.$url = 'http://localhost:4201/api'
-Vue.prototype.$token = localStorage.getItem('token')
-Vue.use(Notifications)
-Vue.use(BootstrapVue)
-Vue.use(ModalPlugin)
-
+// Creación de la instancia de Vue
 new Vue({
   router,
   store,
-  render: function (h) { return h(App) }
-}).$mount('#app')
+  render: function (h) {return h(App)},
+}).$mount('#app');
