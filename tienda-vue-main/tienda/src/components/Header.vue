@@ -50,40 +50,66 @@
             <li class="nav-item">
               <router-link class="nav-link" :to="{ name: 'shop' }">Tienda</router-link>
             </li>
-            <!-- Categorías -->
+            <!-- Principal Categorías -->
             <li class="nav-item dropdown position-static">
-              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Categorías</a>
+              <!-- Botón principal que abre el dropdown -->
+              <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
+                aria-expanded="false">Categorías</a>
+
+              <!-- Dropdown desplegable -->
               <div class="dropdown-menu dropdown-menu-animated py-3" id="categoriesDropdown">
+                <!-- Enlace principal a la vista de todas las categorías -->
+                <router-link class="dropdown-item text-uppercase fw-bold text-center" :to="{ name: 'categories' }">
+                  Ver todas las categorías
+                </router-link>
+                <hr>
+                <!-- Subcategorías -->
                 <div class="row px-3">
                   <div class="col-lg-4">
                     <h6 class="text-uppercase">Vapes</h6>
                     <ul class="list-unstyled">
-                      <li><router-link class="dropdown-item"
-                          :to="{ name: 'category', params: { slug: 'pods' } }">Pods</router-link></li>
-                      <li><router-link class="dropdown-item"
-                          :to="{ name: 'category', params: { slug: 'mods' } }">Mods</router-link></li>
-                      <li><router-link class="dropdown-item"
-                          :to="{ name: 'category', params: { slug: 'starter-kits' } }">Kits de Inicio</router-link></li>
+                      <li>
+                        <router-link class="dropdown-item"
+                          :to="{ name: 'category', params: { slug: 'pods' } }">Pods</router-link>
+                      </li>
+                      <li>
+                        <router-link class="dropdown-item"
+                          :to="{ name: 'category', params: { slug: 'mods' } }">Mods</router-link>
+                      </li>
+                      <li>
+                        <router-link class="dropdown-item"
+                          :to="{ name: 'category', params: { slug: 'starter-kits' } }">Kits de Inicio</router-link>
+                      </li>
                     </ul>
                   </div>
                   <div class="col-lg-4">
                     <h6 class="text-uppercase">Líquidos</h6>
                     <ul class="list-unstyled">
-                      <li><router-link class="dropdown-item" :to="{ name: 'category', params: { slug: 'salts' } }">Sales
-                          de Nicotina</router-link></li>
-                      <li><router-link class="dropdown-item"
-                          :to="{ name: 'category', params: { slug: 'freebase' } }">Freebase</router-link></li>
+                      <li>
+                        <router-link class="dropdown-item" :to="{ name: 'category', params: { slug: 'salts' } }">Sales
+                          Nicotina</router-link>
+                      </li>
+                      <li>
+                        <router-link class="dropdown-item"
+                          :to="{ name: 'category', params: { slug: 'freebase' } }">Freebase</router-link>
+                      </li>
                     </ul>
                   </div>
                   <div class="col-lg-4">
                     <h6 class="text-uppercase">Accesorios</h6>
                     <ul class="list-unstyled">
-                      <li><router-link class="dropdown-item"
-                          :to="{ name: 'category', params: { slug: 'coils' } }">Resistencias</router-link></li>
-                      <li><router-link class="dropdown-item"
-                          :to="{ name: 'category', params: { slug: 'baterias' } }">Baterías</router-link></li>
-                      <li><router-link class="dropdown-item"
-                          :to="{ name: 'category', params: { slug: 'cargadores' } }">Cargadores</router-link></li>
+                      <li>
+                        <router-link class="dropdown-item"
+                          :to="{ name: 'category', params: { slug: 'coils' } }">Resistencias</router-link>
+                      </li>
+                      <li>
+                        <router-link class="dropdown-item"
+                          :to="{ name: 'category', params: { slug: 'baterias' } }">Baterías</router-link>
+                      </li>
+                      <li>
+                        <router-link class="dropdown-item"
+                          :to="{ name: 'category', params: { slug: 'cargadores' } }">Cargadores</router-link>
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -172,24 +198,21 @@ export default {
 </script>
 
 <style>
-/* Centrar el menú en pantallas grandes */
 @media (min-width: 992px) {
   #categoriesDropdown {
-    left: 50% !important; /* Coloca el menú al centro horizontalmente */
-    transform: translateX(-50%) !important; /* Ajusta para centrar perfectamente */
-    margin-top: 1rem; /* Añade espacio entre el botón y el menú */
-    width: auto; /* Permite que el contenido ajuste su tamaño */
-    max-width: 600px; /* Define un ancho máximo para el menú */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin-top: 1rem;
+    width: auto;
+    max-width: 600px;
   }
 }
 
-/* Asegura un diseño correcto dentro del menú */
 .dropdown-menu .row {
-  justify-content: center; /* Centra las columnas del menú */
-  text-align: center; /* Centra el texto */
+  justify-content: center;
+  text-align: center;
 }
 
-/* Opciones del menú */
 .dropdown-item {
   font-size: 1rem;
   padding: 0.5rem 1rem;

@@ -82,7 +82,7 @@ export default {
         let user_data = JSON.parse(this.$store.state.user);
    
         this.venta.transaccion = this.payment_id;
-        this.venta.envio = this.$envio;
+        this.venta.envio = this.envio;
         this.venta.cliente = user_data._id;
 
         if(this.$route.params.direccion){

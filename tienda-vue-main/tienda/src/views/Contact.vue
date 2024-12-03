@@ -1,9 +1,17 @@
 <template>
     <div class="contact-page">
-        <section class="hero-section">
-            <div class="container text-center">
-                <h1 class="display-4">Contáctanos</h1>
-                <p class="lead">Estamos aquí para ayudarte con cualquier consulta o información que necesites.</p>
+        <!-- Sección Hero -->
+        <section class="hero text-center text-white d-flex align-items-center justify-content-center"
+            style="background-image: url('/assets/images/contacto.png'); background-size: cover; background-position: center; height: 400px; margin-top: 100px;">
+            <div class="container">
+                <ol class="breadcrumb justify-content-center">
+                    <li class="breadcrumb-item">
+                        <router-link to="/" class="text-white">Inicio</router-link>
+                    </li>
+                    <li class="breadcrumb-item active text-white">Contáctanos</li>
+                </ol>
+                <h2 class="hero-heading" style="font-size: 3rem; font-weight: bold;">Contáctanos</h2>
+                <p class="lead mt-3">Estamos aquí para ayudarte con cualquier consulta o información que necesites.</p>
             </div>
         </section>
 
@@ -88,15 +96,26 @@ export default {
 </script>
 
 <style scoped>
-.hero-section {
-    background-image: url('https://via.placeholder.com/1200x400'); 
-  /*  background-image: url('/assets/images/contacto.png'); */
-    background-size: cover;
-    background-position: center;
+.hero {
+    background-color: #005f96;
     color: white;
-    text-align: center;
-    padding: 80px 15px; 
-    margin-top: 80px; 
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.breadcrumb-item a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.breadcrumb-item.active {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .contact-details h4,

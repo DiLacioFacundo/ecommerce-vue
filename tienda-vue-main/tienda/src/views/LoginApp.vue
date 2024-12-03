@@ -1,17 +1,22 @@
 <template>
     <div>
-        <!-- Encabezado -->
-        <section class="hero" style="margin-top: 11rem;">
+        <!-- Encabezado Hero -->
+        <section class="hero text-center text-white d-flex align-items-center justify-content-center"
+            style="background-image: url('/assets/images/login-hero.png'); background-size: cover; background-position: center; height: 400px; margin-top: 100px;">
             <div class="container">
-                <div class="hero-content pb-5 text-center">
-                    <h1 class="hero-heading mb-0">Zona de Clientes</h1>
-                </div>
+                <ol class="breadcrumb justify-content-center">
+                    <li class="breadcrumb-item">
+                        <router-link to="/" class="text-white">Inicio</router-link>
+                    </li>
+                    <li class="breadcrumb-item active text-white">Zona de Clientes</li>
+                </ol>
+                <h2 class="hero-heading" style="font-size: 3rem; font-weight: bold;">Zona de Clientes</h2>
             </div>
         </section>
 
         <!-- Sección de Login y Registro -->
         <section>
-            <div class="container">
+            <div class="container py-5">
                 <div class="row justify-content-center">
                     <!-- Iniciar Sesión -->
                     <div class="col-lg-5">
@@ -41,8 +46,7 @@
                                     </div>
 
                                     <div class="mb-4 text-center">
-                                        <button class="btn btn-outline-dark" type="submit">Ingresar
-                                        </button>
+                                        <button class="btn btn-primary" type="submit">Ingresar</button>
                                     </div>
                                 </form>
                             </div>
@@ -81,8 +85,7 @@
                                     </div>
 
                                     <div class="mb-4 text-center">
-                                        <button class="btn btn-outline-dark" type="submit">Registrarse
-                                        </button>
+                                        <button class="btn btn-primary" type="submit">Registrarse</button>
                                     </div>
                                 </form>
                             </div>
@@ -93,7 +96,6 @@
         </section>
     </div>
 </template>
-
 
 <script>
 import axios from 'axios';
@@ -175,6 +177,28 @@ export default {
 </script>
 
 <style>
+.hero {
+    background-color: #005f96;
+    color: white;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.breadcrumb-item a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.breadcrumb-item.active {
+    color: rgba(255, 255, 255, 0.7);
+}
+
 .block {
     background: #f9f9f9;
     border: 1px solid #ddd;
@@ -193,9 +217,16 @@ export default {
     text-align: left;
 }
 
-.btn-outline-dark {
+.btn-primary {
     border-radius: 30px;
     padding: 10px 20px;
+    background-color: #005f96;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #004080;
 }
 
 .text-uppercase {

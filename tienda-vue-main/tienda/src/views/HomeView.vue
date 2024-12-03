@@ -5,28 +5,28 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-lg-6 dark-overlay split-screen-column align-items-center align-items-lg-end"
-            style="background-image: url(https://example.com/vapes-collection-mens.jpg); background-color: #d2cecb;">
+            style="background-image: url('https://example.com/vapes-collection-mens.jpg'); background-color: #d2cecb;">
             <div class="overlay-content py-6 mt-6 px-lg-5 mt-lg-0 mb-lg-5">
               <h1 class="display-3 mb-4 text-white fw-bold split-screen-heading letter-spacing-1">Vapes para él</h1>
               <p class="lead mb-4">
                 Descubre nuestra colección exclusiva de vapes para hombres. Innovación y estilo en cada calada.
               </p>
               <p>
-                <a class="btn btn-light mx-1 mb-1" href="category.html">Ver colección</a>
-                <a class="btn btn-outline-light mx-1 mb-1" href="category.html">Explorar más</a>
+                <router-link to="/shop?category=vapes" class="btn btn-outline-light mx-1 mb-1">Ver colección</router-link>
+                <router-link to="/shop" class="btn btn-outline-light mx-1 mb-1">Explorar más</router-link>
               </p>
             </div>
           </div>
           <div class="col-lg-6 split-screen-column align-items-center align-items-lg-end"
-            style="background-image: url(https://example.com/vapes-collection-womens.jpg); background-color: #e5b6b4;">
+            style="background-image: url('https://example.com/vapes-collection-womens.jpg'); background-color: #e5b6b4;">
             <div class="py-6 px-lg-5 mb-lg-5">
               <h1 class="display-3 mb-4 text-white fw-bold split-screen-heading letter-spacing-1">Vapes para ella</h1>
               <p class="lead mb-4">
                 Nuestra selección de vapes para mujeres ofrece diseño elegante y sabores únicos.
               </p>
               <p>
-                <a class="btn btn-light mx-1 mb-1" href="category.html">Ver colección</a>
-                <a class="btn btn-outline-light mx-1 mb-1" href="category.html">Explorar más</a>
+                <router-link to="/shop?category=vapes" class="btn btn-outline-light mx-1 mb-1">Ver colección</router-link>
+                <router-link to="/shop" class="btn btn-outline-light mx-1 mb-1">Explorar más</router-link>
               </p>
             </div>
           </div>
@@ -58,13 +58,13 @@
                 <img class="img-fluid" :src="`${$url}/obtener_portada_producto/${producto.portada}`"
                   :alt="producto.titulo" />
                 <div class="product-hover-overlay">
-                  <a class="product-hover-overlay-link" href="detail.html"></a>
+                  <router-link :to="{ name: 'show-productos', params: { slug: producto.slug } }" class="product-hover-overlay-link"></router-link>
                 </div>
               </div>
               <div class="py-2">
                 <p class="text-muted text-sm mb-1">{{ producto.categoria }}</p>
                 <h3 class="h6 text-uppercase mb-1">
-                  <a class="text-dark" href="detail.html">{{ producto.titulo }}</a>
+                  <router-link :to="{ name: 'show-productos', params: { slug: producto.slug } }" class="text-dark">{{ producto.titulo }}</router-link>
                 </h3>
                 <span class="text-muted">{{ formatearMoneda(producto.precio) }}</span>
               </div>
@@ -95,7 +95,7 @@
               <div class="py-2">
                 <p class="text-muted text-sm mb-1">{{ producto.categoria }}</p>
                 <h3 class="h6 text-uppercase mb-1">
-                  <a class="text-dark" href="detail.html">{{ producto.titulo }}</a>
+                  <router-link :to="{ name: 'show-productos', params: { slug: producto.slug } }" class="text-dark">{{ producto.titulo }}</router-link>
                 </h3>
                 <span class="text-muted">{{ formatearMoneda(producto.precio) }}</span>
               </div>
@@ -153,15 +153,68 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .product-image {
   display: block !important;
   overflow: hidden !important;
   height: 320px !important;
+  transition: transform 0.3s ease-in-out;
+}
+
+.product-image:hover {
+  transform: scale(1.05);
 }
 
 .img-fluid {
   height: auto !important;
   display: block !important;
+}
+
+.card {
+  border: none;
+  border-radius: 10px;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background-color: #005f96;
+  border: none;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: #004080;
+}
+
+.hero {
+  background-color: #005f96;
+  color: white;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+.breadcrumb {
+  background-color: transparent;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.breadcrumb-item a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.breadcrumb-item.active {
+  color: rgba(255, 255, 255, 0.7);
 }
 </style>

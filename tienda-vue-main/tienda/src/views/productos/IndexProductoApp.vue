@@ -1,28 +1,25 @@
 <template>
     <div style="background: #f3f3f3;" class="pb-5">
-        <section class="hero" style="margin-top: 8rem !important;">
+        <!-- Sección Hero -->
+        <section class="hero text-center text-white d-flex align-items-center justify-content-center"
+            style="background-image: url('/assets/images/shop-hero.png'); background-size: cover; background-position: center; height: 400px; margin-top: 100px;">
             <div class="container">
                 <ol class="breadcrumb justify-content-center">
                     <li class="breadcrumb-item">
-                        <router-link to="/">Inicio</router-link>
+                        <router-link to="/" class="text-white">Inicio</router-link>
                     </li>
-                    <li class="breadcrumb-item active">Tienda</li>
+                    <li class="breadcrumb-item active text-white">Tienda</li>
                 </ol>
-                <div class="hero-content pb-5 text-center">
-                    <h1 class="hero-heading">Tienda de Vapes</h1>
-                    <div class="row">
-                        <div class="col-xl-8 offset-xl-2">
-                            <p class="lead text-muted">Encuentra una gran variedad de vapes, líquidos y accesorios de
-                                las mejores marcas.</p>
-                        </div>
-                    </div>
-                </div>
+                <h2 class="hero-heading" style="font-size: 3rem; font-weight: bold;">Tienda de Vapes</h2>
+                <p class="lead mt-3">Encuentra una gran variedad de vapes, líquidos y accesorios de las mejores marcas.</p>
             </div>
         </section>
+
+        <!-- Contenido Principal -->
         <div class="container">
             <div class="row">
                 <!-- Sidebar -->
-                <div class="sidebar col-xl-3 col-lg-4 order-lg-1">
+                <div class="sidebar col-xl-3 col-lg-4 order-lg-1 mt-5">
                     <!-- Categorías -->
                     <div class="sidebar-block">
                         <h6 class="sidebar-heading">Tipos de Vapes</h6>
@@ -33,7 +30,7 @@
                                 </a>
                                 <ul v-if="item.subcategorias" class="list-unstyled ms-3">
                                     <li v-for="sub in item.subcategorias" :key="sub.titulo">
-                                        <a href="#" @click="applySubcategoryFilter(sub.titulo)">
+                                        <a href="#" class="nav-link" @click="applySubcategoryFilter(sub.titulo)">
                                             {{ sub.titulo }}
                                         </a>
                                     </li>
@@ -46,14 +43,15 @@
                         <h6 class="sidebar-heading">Rango de precios</h6>
                         <div class="mt-3">
                             <input type="range" v-model="minRange" :min="slider.min || 0" :max="slider.max || 2000">
-                            <span>{{ convertCurrency(minRange) }}</span> -
+                            <span>{{ convertCurrency(minRange) }}</span> - 
                             <input type="range" v-model="maxRange" :min="slider.min || 0" :max="slider.max || 2000">
                             <span>{{ convertCurrency(maxRange) }}</span>
                         </div>
                     </div>
                 </div>
+
                 <!-- Productos -->
-                <div class="products-grid col-xl-9 col-lg-8 order-lg-2">
+                <div class="products-grid col-xl-9 col-lg-8 order-lg-2 mt-5">
                     <header class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
                         <h2 class="section-title">Productos</h2>
                         <select v-model="sortBy" @change="sortProducts" class="form-select w-auto">
@@ -75,8 +73,7 @@
                                 </div>
                                 <div class="product-info p-3 d-flex flex-column flex-grow-1">
                                     <h6 class="product-title text-truncate mb-2">{{ item.titulo }}</h6>
-                                    <span class="product-price text-primary fw-bold">{{ convertCurrency(item.precio)
-                                        }}</span>
+                                    <span class="product-price text-primary fw-bold">{{ convertCurrency(item.precio) }}</span>
                                     <button class="btn btn-outline-primary btn-sm mt-auto" @click="addToCart(item)">
                                         <i class="bi bi-cart"></i> Añadir al carrito
                                     </button>
@@ -92,6 +89,7 @@
 
             </div>
         </div>
+
         <!-- Modal Vista Rápida -->
         <div v-if="showModal" class="modal fade show" style="display: block;" @click.self="closeQuickView">
             <div class="modal-dialog modal-lg">
@@ -130,22 +128,12 @@ export default {
             currentPage: 1,
             perPage: 12,
             sortBy: 'default',
+            envio: 0,  // Valor del costo de envío
             showModal: false,
             selectedProduct: null,
         };
     },
     mounted() {
-        // Cargar configuración inicial
-        axios.get('/api/config')
-            .then((response) => {
-                this.slider.min = response.data.min || 0;
-                this.slider.max = response.data.max || 2000;
-            })
-            .catch((error) => {
-                console.error('Error al cargar la configuración:', error);
-            });
-
-        // Cargar categorías y productos iniciales
         this.fetchCategorias();
         this.fetchProductos();
     },
@@ -173,6 +161,7 @@ export default {
                 .then((response) => {
                     this.productos = response.data.items;
                     this.totalProductos = response.data.total;
+                    this.calcularEnvio(); // Llamada para calcular el costo de envío al cargar productos
                 })
                 .catch((error) => {
                     console.error('Error al cargar productos:', error);
@@ -202,16 +191,36 @@ export default {
         addToCart(product) {
             console.log('Producto añadido al carrito:', product);
         },
+        // Método para calcular el costo de envío
+        calcularEnvio() {
+            this.envio = 10; // Lógica simple, por ejemplo, asignamos un valor fijo para el envío
+        },
     },
 };
 </script>
 
-
 <style>
-.section-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #343a40;
+.hero {
+    background-color: #005f96;
+    color: white;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+    padding: 2rem 0;
+}
+
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+.breadcrumb-item a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.breadcrumb-item.active {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .product-card {
@@ -260,12 +269,6 @@ export default {
     display: inline-block;
 }
 
-.product-info {
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-}
-
 .product-title {
     font-size: 1rem;
     color: #495057;
@@ -274,10 +277,6 @@ export default {
 .product-price {
     font-size: 1.1rem;
     color: #007bff;
-}
-
-.product-info button {
-    margin-top: auto;
 }
 
 .b-pagination {

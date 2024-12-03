@@ -20,6 +20,7 @@ const routes = [
   { path: '/cuenta/venta/:id', name: 'venta', component: () => import('@/views/cuenta/ventas/VentaDetalleApp.vue') },
   { path: '/cuenta/venta', name: 'venta-index', component: () => import('@/views/cuenta/ventas/VentaIndexApp.vue') },
   { path: '/contact', name: 'contact', component: () => import('@/views/Contact.vue') },
+  {path: '/categories',name: 'categories',component: () => import('@/views/CategoriesView.vue')}
 ];
 
 const router = new VueRouter({
