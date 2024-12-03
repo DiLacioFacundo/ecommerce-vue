@@ -1,5 +1,8 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
+import Vue from 'vue'; // Import Vue
+import VueRouter from 'vue-router'; // Import VueRouter
+import HomeView from '../views/HomeView.vue'; // Import your views
+
+Vue.use(VueRouter);
 
 const routes = [
   {
@@ -16,11 +19,13 @@ const routes = [
   { path: '/verificacion/:estado/:direccion?', name: 'verificacion', component: () => import('@/views/VerificacionView.vue') },
   { path: '/cuenta/venta/:id', name: 'venta', component: () => import('@/views/cuenta/ventas/VentaDetalleApp.vue') },
   { path: '/cuenta/venta', name: 'venta-index', component: () => import('@/views/cuenta/ventas/VentaIndexApp.vue') },
+  { path: '/contact', name: 'contact', component: () => import('@/views/Contact.vue') },
 ];
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-});
+const router = new VueRouter({
+  mode: 'history',
+  base: process.env.BASE_URL,
+  routes
+})
 
-export default router;
+export default router

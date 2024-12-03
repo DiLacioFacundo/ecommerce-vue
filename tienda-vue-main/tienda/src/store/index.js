@@ -1,11 +1,16 @@
-import { createStore } from 'vuex';
+import Vue from 'vue';
+import Vuex from 'vuex';
 
-export default createStore({
+Vue.use(Vuex); // Register Vuex plugin
+
+export default new Vuex.Store({
   state: {
-    token: localStorage.getItem('token'),
-    user: localStorage.getItem('user_data'),
+    token: localStorage.getItem('token') || null,
+    user: localStorage.getItem('user_data') || null,
   },
   getters: {
+    isAuthenticated: (state) => !!state.token,
+    getUser: (state) => state.user,
   },
   mutations: {
     setToken(state, token) {
@@ -13,6 +18,10 @@ export default createStore({
     },
     setUser(state, user) {
       state.user = user;
+    },
+    clearAuth(state) {
+      state.token = null;
+      state.user = null;
     },
   },
   actions: {
@@ -25,10 +34,11 @@ export default createStore({
       localStorage.setItem('user_data', user);
     },
     logout({ commit }) {
-      commit('setToken', null);
+      commit('clearAuth');
       localStorage.clear();
-    }
+    },
   },
   modules: {
-  }
+    // Add Vuex modules here if needed
+  },
 });
