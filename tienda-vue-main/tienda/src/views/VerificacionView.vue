@@ -102,7 +102,7 @@ export default {
             axios.get(this.$url+'/obtener_carrito_cliente',{
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': this.$store.state.token
+                    Authorization: `Bearer ${this.$store.state.token}`,
                 }
             }).then((result)=>{
                 this.total = 0;

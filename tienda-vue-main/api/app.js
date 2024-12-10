@@ -4,72 +4,83 @@ var mongoose = require('mongoose');
 var bodyparser = require('body-parser');
 const { createServer } = require("http");
 const { Server } = require("socket.io");
+const cors = require('cors'); 
+const { decodeToken } = require('./middlewares/authenticate');
+
+// Importar las rutas del backend
+var cliente_router = require('./routes/cliente');
+var usuario_router = require('./routes/usuario');
+var producto_router = require('./routes/producto');
+var customer_router = require('./routes/customer');
+var venta_router = require('./routes/venta');
+var public_router = require('./routes/public');
+var categoria_router = require('./routes/categoria'); 
 
 // Configuración de la aplicación
 var app = express();
-var port = process.env.PORT || 4201; // Define el puerto
+var port = process.env.PORT || 4201;
 
 // Configuración del servidor HTTP y WebSocket
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-    cors: { origin: '*' }, // Permitir conexiones desde cualquier origen
+    cors: { origin: '*' },
 });
 
 // Configuración de WebSocket
 io.on("connection", (socket) => {
     console.log(`Cliente conectado: ${socket.id}`);
-
-    socket.on('emit_method', function (data) {
+    socket.on('emit_method', (data) => {
         io.emit('semit_method', data);
         console.log(`Mensaje recibido: ${data}`);
     });
-
     socket.on('disconnect', () => {
         console.log(`Cliente desconectado: ${socket.id}`);
     });
 });
-
-// Rutas del backend
-var cliente_router = require('./routes/cliente');
-var customer_router = require('./routes/customer');
-var producto_router = require('./routes/producto');
-var public_router = require('./routes/public');
-var usuario_router = require('./routes/usuario');
-var venta_router = require('./routes/venta');
 
 // Configuración de body-parser
 app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
 app.use(bodyparser.json({ limit: '50mb', extended: true }));
 
 // Configuración de CORS
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Access-Control-Allow-Request-Method');
-    res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
-    res.header('Allow', 'GET, PUT, POST, DELETE, OPTIONS');
-    next();
-});
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Authorization', 'X-API-KEY', 'Origin', 'X-Requested-With', 'Content-Type']
+}));
 
 // Conexión a MongoDB
 mongoose.connect('mongodb://127.0.0.1:27017/tienda')
     .then(() => {
         console.log('Conexión a la base de datos establecida');
-        // Levantar el servidor HTTP y WebSocket
-        httpServer.listen(port, () => {
-            console.log(`Servidor corriendo en el puerto ${port}`);
-        });
     })
     .catch((err) => {
         console.error('Error al conectar a la base de datos:', err);
     });
 
-// Registro de rutas
+// Servir archivos estáticos
+app.use('/assets', express.static('public/assets'));
+
+// Rutas públicas (si las tienes)
+app.use('/api', public_router);
+
+// Rutas protegidas (requieren autenticación)
 app.use('/api', cliente_router);
 app.use('/api', usuario_router);
 app.use('/api', producto_router);
-app.use('/api', public_router);
 app.use('/api', customer_router);
 app.use('/api', venta_router);
+app.use('/api', categoria_router); 
 
-// Exportación de la aplicación
+// Levantar el servidor
+httpServer.listen(port, () => {
+    console.log(`Servidor corriendo en el puerto ${port}`);
+}).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.error(`El puerto ${port} ya está en uso. Intenta usar otro puerto.`);
+    } else {
+        console.error('Error al iniciar el servidor:', err);
+    }
+});
+
 module.exports = app;

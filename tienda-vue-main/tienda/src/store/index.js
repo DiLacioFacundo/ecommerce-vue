@@ -1,16 +1,16 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-Vue.use(Vuex); // Register Vuex plugin
+Vue.use(Vuex); // Registrar el plugin Vuex
 
 export default new Vuex.Store({
   state: {
     token: localStorage.getItem('token') || null,
-    user: localStorage.getItem('user_data') || null,
+    user: JSON.parse(localStorage.getItem('user_data')) || null,
   },
   getters: {
-    isAuthenticated: (state) => !!state.token,
-    getUser: (state) => state.user,
+    isLoggedIn: (state) => !!state.token,
+    currentUser: (state) => state.user,
   },
   mutations: {
     setToken(state, token) {
@@ -31,14 +31,12 @@ export default new Vuex.Store({
     },
     saveUser({ commit }, user) {
       commit('setUser', user);
-      localStorage.setItem('user_data', user);
+      localStorage.setItem('user_data', JSON.stringify(user));
     },
     logout({ commit }) {
       commit('clearAuth');
-      localStorage.clear();
+      localStorage.removeItem('token');
+      localStorage.removeItem('user_data');
     },
-  },
-  modules: {
-    // Add Vuex modules here if needed
   },
 });

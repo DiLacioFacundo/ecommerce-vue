@@ -119,7 +119,7 @@
 
                                           <!-- Avatar -->
                                           <div class="avatar avatar-xs align-middle me-2">
-                                            <img class="avatar-img rounded-circle" src="/assets/img/avatar-1.jpg" alt="...">
+                                            <img class="avatar-img rounded-circle" src="/assets/images/avatar-1.jpg" alt="...">
                                           </div> <a class="item-name text-reset">{{item.nombres}} {{item.apellidos}}</a>
 
                                         </td>

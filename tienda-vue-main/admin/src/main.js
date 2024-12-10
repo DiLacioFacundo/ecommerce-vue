@@ -5,10 +5,13 @@ import router from './router';
 import store from './store';
 import Notifications from 'vue-notification';
 import VuePaginate from 'vue-paginate'
+
 import { BootstrapVue, IconsPlugin, ModalPlugin } from 'bootstrap-vue';
 // Bootstrap y BootstrapVue
 import 'vue-search-select/dist/VueSearchSelect.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
+import "@fortawesome/fontawesome-free/css/all.css";
+import "@fortawesome/fontawesome-free/js/all.js";
 
 
 // Configuración global

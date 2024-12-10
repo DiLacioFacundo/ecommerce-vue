@@ -1,7 +1,6 @@
 <template>
   <div id="app">
     <nav>
-      <!-- <Sidebar/> -->
       <notifications group="foo" />
       <router-view/>
       
@@ -12,6 +11,7 @@
 <script>
 import NavBar from '@/components/TopNav.vue';
 import Sidebar from '@/components/Sidebar.vue';
+
 export default {
   components:{
     Sidebar,

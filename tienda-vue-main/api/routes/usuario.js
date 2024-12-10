@@ -11,5 +11,6 @@ router.get('/listar_usuario_admin/:filtro?', authenticate.decodeToken, usuarioCo
 router.get('/obtener_usuario_admin/:id', authenticate.decodeToken, usuarioControllers.obtener_usuario_admin);
 router.put('/actualizar_usuario_admin/:id', authenticate.decodeToken, usuarioControllers.actualizar_usuario_admin);
 router.put('/cambiar_estado_usuario_admin/:id', authenticate.decodeToken, usuarioControllers.cambiar_estado_usuario_admin); 
+router.post('/renovar_token', authenticate.decodeToken, usuarioControllers.renovar_token);
 
 module.exports = router;

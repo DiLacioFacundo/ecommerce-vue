@@ -1,12 +1,15 @@
 const express = require('express');
-const publicController = require('../controllers/publicController');
-
+const PublicController = require('../controllers/publicController');
 var router = express.Router();
 
+// Rutas públicas para productos
+router.get('/nuevos_productos', PublicController.obtener_nuevos_productos); // Últimos 4 productos
+router.get('/productos_recomendados', PublicController.obtener_productos_recomendados); // 8 productos recomendados
+router.get('/productos_shop', PublicController.obtener_productos_shop); // Todos los productos disponibles en la tienda
 
-router.get('/obtener_nuevos_productos', publicController.obtener_nuevos_productos);
-router.get('/obtener_productos_recomendados', publicController.obtener_productos_recomendados);
-router.get('/obtener_productos_shop',  publicController.obtener_productos_shop);
-router.get('/listar_categorias_public',  publicController.listar_categorias_public);
+// Rutas públicas para categorías y subcategorías
+router.get('/categorias', PublicController.listar_categorias_public); // Categorías con subcategorías y conteo de productos
+router.get('/subcategorias/:categoriaId',PublicController.listar_subcategorias_por_categoria_public
+); 
 
 module.exports = router;

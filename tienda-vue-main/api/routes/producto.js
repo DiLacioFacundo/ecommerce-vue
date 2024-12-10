@@ -11,7 +11,7 @@ var path_galeria = multipart({ uploadDir: './uploads/galeria' });
 
 var router = express.Router();
 
-router.post('/registro_producto_admin', [authenticate.decodeToken, path], productoController.registro_producto_admin);
+router.post('/registrar_producto_admin', [authenticate.decodeToken,path], productoController.registrar_producto_admin);
 router.get('/listar_productos_admin/:filtro?', authenticate.decodeToken, productoController.listar_productos_admin);
 router.get('/listar_activos_productos_admin', authenticate.decodeToken, productoController.listar_activos_productos_admin);
 
@@ -20,7 +20,7 @@ router.get('/obtener_portada_admin/:id',authenticate.decodeToken, productoContro
 router.put('/actualizar_producto_admin/:id',[authenticate.decodeToken, path], productoController.actualizar_producto_admin);
 
 router.post('/registro_variedad_producto', authenticate.decodeToken, productoController.registro_variedad_producto);
-router.get('/obtener_variedades_producto/:id', authenticate.decodeToken, productoController.obtener_variedades_producto);
+router.get('/obtener_variedad_producto/:id', authenticate.decodeToken, productoController.obtener_variedad_producto);
 router.delete('/eliminar_variedad_producto/:id',authenticate.decodeToken, productoController.eliminar_variedad_producto);
 
 

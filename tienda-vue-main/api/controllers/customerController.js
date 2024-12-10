@@ -27,22 +27,40 @@ const crear_producto_carrito = async function(req,res){
     }
 }
 
-const obtener_carrito_cliente = async function(req,res){
-    if(req.user){
-       let carrito = await Carrito.find({cliente:req.user.sub}).populate('producto').populate('variedad').sort({createdAt:-1}).limit(5);
-       let carrito_general = await Carrito.find({cliente:req.user.sub}).populate('producto').populate('variedad').sort({createdAt:-1});
-       res.status(200).send({carrito,carrito_general});
-    }else{
-        res.status(500).send({data:undefined,message: 'ErrorToken'});
+const obtener_carrito_cliente = async function(req, res) {
+    if (req.user) {  // Verifica si el usuario está autenticado
+        try {
+            // Busca los primeros 5 ítems del carrito
+            let carrito = await Carrito.find({ cliente: req.user.sub })
+                .populate('producto') // Población del campo 'producto'
+                .populate('variedad') // Población del campo 'variedad'
+                .sort({ createdAt: -1 }) // Ordena por la fecha de creación descendente
+                .limit(5); // Limita a 5 resultados
+
+            // Busca el carrito completo
+            let carrito_general = await Carrito.find({ cliente: req.user.sub })
+                .populate('producto')
+                .populate('variedad')
+                .sort({ createdAt: -1 });
+
+            // Devuelve el carrito y el carrito general
+            res.status(200).send({ carrito, carrito_general });
+        } catch (error) {
+            // Manejo de errores en caso de fallo en la base de datos
+            res.status(500).send({ message: 'Error al obtener el carrito', error });
+        }
+    } else {
+        // Usuario no autenticado o sin token
+        res.status(401).send({ data: undefined, message: 'ErrorToken' });
     }
-}
+};
 
 
 
 const eliminar_producto_carrito = async function(req,res){
     if(req.user){
        let id = req.params['id'];
-       let reg = await Carrito.findByIdAndRemove({_id:id});
+       let reg = await Carrito.findByIdAndDelete({_id:id});
        res.status(200).send(reg);
     }else{
         res.status(500).send({data:undefined,message: 'ErrorToken'});
@@ -73,7 +91,7 @@ const obtener_direcciones_cliente = async function(req,res){
 const eliminar_direccion_cliente = async function(req,res){
     if(req.user){
        let id = req.params['id'];
-       let direccion = await Direccion.findByIdAndRemove({_id:id});
+       let direccion = await Direccion.findByIdAndDelete({_id:id});
        res.status(200).send(direccion);
     }else{
         res.status(500).send({data:undefined,message: 'ErrorToken'});

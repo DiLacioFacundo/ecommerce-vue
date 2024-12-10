@@ -1,167 +1,151 @@
 <template>
-  <nav class="navbar navbar-vertical fixed-start navbar-expand-md navbar-light" id="sidebar">
+  <nav class="navbar navbar-vertical fixed-start navbar-expand-md" id="sidebar">
     <div class="container-fluid">
-  
-      <!-- Toggler -->
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarCollapse" aria-controls="sidebarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-  
       <!-- Brand -->
-      <a class="navbar-brand" href="./index.html">
-        <img src="/assets/img/logo.svg" class="navbar-brand-img mx-auto" alt="...">
-      </a>
-  
-      <!-- User (xs) -->
-      <div class="navbar-user d-md-none">
-  
-        <!-- Dropdown -->
-        <div class="dropdown">
-  
-          <!-- Toggle -->
-          <a href="#" id="sidebarIcon" class="dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <div class="avatar avatar-sm avatar-online">
-              <img src="/assets/img/avatar-1.jpg" class="avatar-img rounded-circle" alt="..." style="-webkit-mask-image: none;">
-            </div>
-          </a>
-  
-          <!-- Menu -->
-          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sidebarIcon">
-            <a href="./profile-posts.html" class="dropdown-item">Profile</a>
-            <a href="./account-general.html" class="dropdown-item">Settings</a>
-            <hr class="dropdown-divider">
-            <a href="./sign-in.html" class="dropdown-item">Logout</a>
-          </div>
-  
-        </div>
-  
+      <div class="navbar-brand d-flex flex-column align-items-center py-3">
+        <img class="navbar-brand-img" src="/assets/logo.png" alt="Logo" />
       </div>
-  
-      <!-- Collapse -->
-      <div class="collapse navbar-collapse" id="sidebarCollapse">
-  
-        <!-- Form -->
-        <form class="mt-4 mb-3 d-md-none">
-          <div class="input-group input-group-rounded input-group-merge input-group-reverse">
-            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
-            <div class="input-group-text">
-              <span class="fe fe-search"></span>
-            </div>
-          </div>
-        </form>
-  
-        <!-- Navigation -->
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="#sidebarDashboards" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="sidebarDashboards">
-              <i class="fe fe-home"></i> Dashboards
-            </a>
-            <div class="collapse show" id="sidebarDashboards">
-              <ul class="nav nav-sm flex-column">
-                <li class="nav-item">
-                  <a href="./index.html" class="nav-link active">
-                    Default
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="./dashboard-project-management.html" class="nav-link ">
-                    Project Management
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="./dashboard-ecommerce.html" class="nav-link ">
-                    E-Commerce
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </li>
-       
-          <li class="nav-item">
-            <router-link to="/colaborador" class="nav-link" active-class="active">
-              <i class="fe fe-user"></i> Colaboradores
-            </router-link>
-          </li>
-         
-        </ul>
 
-        <hr class="navbar-divider my-3">
-        <h6 class="navbar-heading">
-          Control
-        </h6>
+      <!-- Navigation -->
+      <ul class="navbar-nav mt-4">
+        <li class="nav-item">
+          <router-link to="/categorias" class="nav-link" active-class="active">
+            <i class="fe fe-layers"></i>
+            <span>Categorías</span>
+          </router-link>
+          <router-link to="/producto" class="nav-link" active-class="active">
+            <i class="fe fe-shopping-cart"></i>
+            <span>Productos</span>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/ventas" class="nav-link" active-class="active">
+            <i class="fe fe-shopping-bag"></i>
+            <span>Ventas</span>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <!-- Abrir "E-commerce" en una nueva pestaña -->
+          <a @click="openEcommerce" class="nav-link">
+            <i class="fe fe-globe"></i>
+            <span>E-commerce</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <router-link to="/clientes" class="nav-link" active-class="active">
+            <i class="fe fe-user"></i>
+            <span>Clientes</span>
+          </router-link>
+        </li>
+      </ul>
 
-        <ul class="navbar-nav mb-md-4">
-            <li class="nav-item">
-            <router-link to="/producto/create" class="nav-link" active-class="active">
-              <i class="fe fe-shopping-cart"></i> Productos
-            </router-link>
-          </li>
-          <li class="nav-item">
-            <router-link to="/ingreso/create" class="nav-link" active-class="active">
-              <i class="fe fe-folder"></i> Ingreso
-            </router-link>
-          </li>
-
-          <li class="nav-item">
-            <router-link to="/ventas" class="nav-link" active-class="active">
-              <i class="fe fe-shopping-bag"></i> Ventas
-            </router-link>
-          </li>
-        </ul>
-  
-  
-        <!-- Push content down -->
-        <div class="mt-auto"></div>
-  
-  
-          <!-- User (md) -->
-          <div class="navbar-user d-none d-md-flex" id="sidebarUser">
-  
-            <!-- Icon -->
-            <a class="navbar-user-link" data-bs-toggle="offcanvas" href="#sidebarOffcanvasActivity" aria-controls="sidebarOffcanvasActivity">
-              <span class="icon">
-                <i class="fe fe-bell"></i>
-              </span>
-            </a>
-  
-            <!-- Dropup -->
-            <div class="dropup">
-  
-              <!-- Toggle -->
-              <a href="#" id="sidebarIconCopy" class="dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <div class="avatar avatar-sm avatar-online">
-                  <img src="/assets/img/avatar-1.jpg" class="avatar-img rounded-circle" alt="..." style="-webkit-mask-image: none;">
-                </div>
-              </a>
-  
-              <!-- Menu -->
-              <div class="dropdown-menu" aria-labelledby="sidebarIconCopy">
-                <a href="./profile-posts.html" class="dropdown-item">Profile</a>
-                <a href="./account-general.html" class="dropdown-item">Settings</a>
-                <hr class="dropdown-divider">
-                <a href="./sign-in.html" class="dropdown-item">Logout</a>
-              </div>
-  
-            </div>
-  
-            <!-- Icon -->
-            <a class="navbar-user-link" data-bs-toggle="offcanvas" href="#sidebarOffcanvasSearch" aria-controls="sidebarOffcanvasSearch">
-              <span class="icon">
-                <i class="fe fe-search"></i>
-              </span>
-            </a>
-  
-          </div>
-  
-      </div> <!-- / .navbar-collapse -->
-  
+      <!-- Divider -->
+      <hr class="navbar-divider my-4" />
     </div>
   </nav>
 </template>
 
 <script>
 export default {
-name: 'Sidebar',
-}
+  name: "Sidebar",
+  methods: {
+    // Método para abrir E-commerce en una nueva pestaña
+    openEcommerce() {
+      window.open("http://localhost:8086/", "_blank");
+    },
+  },
+};
 </script>
 
+<style scoped>
+/* Sidebar Styles */
+#sidebar {
+  background-color: #343a40; /* Darker background */
+  border-right: 1px solid #e9ecef;
+  width: 250px;
+  transition: width 0.3s ease;
+  height: 100vh;
+  box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1); /* Add shadow */
+}
+
+.navbar-brand-img {
+  width: 100%; /* Responsive logo width */
+  max-width: 150px; /* Max width for larger screens */
+  height: auto;
+}
+
+/* Navigation */
+.nav-link {
+  font-size: 16px;
+  padding: 12px 20px;
+  color: #adb5bd; /* Light gray for text */
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.nav-link i {
+  margin-right: 12px;
+  font-size: 20px; /* Increase icon size */
+  transition: transform 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: #495057; /* Darker background on hover */
+  color: #fff; /* White text on hover */
+}
+
+.nav-link:hover i {
+  transform: scale(1.2); /* Grow icon on hover */
+}
+
+.nav-link.active {
+  background-color: #007bff; /* Blue background for active links */
+  color: #fff;
+}
+
+.navbar-divider {
+  border-top: 1px solid #dee2e6;
+}
+
+.btn {
+  font-size: 16px;
+}
+
+.btn i {
+  font-size: 18px;
+}
+
+/* Scalable Sidebar for Larger Screens */
+@media (min-width: 1200px) {
+  #sidebar {
+    width: 300px; /* Increased width for large desktops */
+  }
+
+  .nav-link {
+    font-size: 18px; /* Slightly larger font size for readability */
+  }
+}
+
+/* Responsive Adjustments for Small Screens */
+@media (max-width: 768px) {
+  #sidebar {
+    width: 200px; /* Reduced width for smaller screens */
+  }
+
+  .navbar-brand-img {
+    max-width: 120px; /* Adjust logo size */
+  }
+
+  .nav-link {
+    font-size: 14px; /* Smaller font size */
+    padding: 8px 10px;
+  }
+}
+
+@media (min-width: 768px) {
+  .navbar-vertical.navbar-expand-md > [class*="container"] {
+    min-height: 0% !important;
+  }
+}
+</style>

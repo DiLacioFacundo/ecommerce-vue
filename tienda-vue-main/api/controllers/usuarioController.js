@@ -77,22 +77,28 @@ const listar_usuario_admin = async function(req,res){
 }
 
 const obtener_usuario_admin = async function(req,res){
-    if(req.user){
-
-        let id = req.params['id'];
-
+    if (req.user) {
         try {
-            let usuario = await Usuario.findById({_id: id});
-       
+            // Obtener el ID del usuario desde el token decodificado
+            const userId = req.user.sub;
+
+            // Buscar al usuario en la base de datos
+            const usuario = await Usuario.findById(userId).select('nombres apellidos email rol');
+
+            if (!usuario) {
+                return res.status(404).send({ message: 'Usuario no encontrado' });
+            }
+
+            // Enviar los datos del usuario al cliente
             res.status(200).send(usuario);
         } catch (error) {
-            res.status(200).send(undefined);
+            console.error('Error al obtener información del usuario:', error);
+            res.status(500).send({ message: 'Error al obtener información del usuario' });
         }
-
-    }else{
-        res.status(500).send({data:undefined,message: 'ErrorToken'});
+    } else {
+        res.status(401).send({ message: 'No autorizado: Token inválido o ausente' });
     }
-}
+};
 
 const actualizar_usuario_admin = async function(req,res){
     if(req.user){
@@ -139,11 +145,25 @@ const cambiar_estado_usuario_admin = async function(req,res){
     }
 }
 
+const renovar_token = async function(req, res) {
+    // Usuario obtenido del middleware decodeToken
+    const user = req.user;
+
+    if (user) {
+        // Crear un nuevo token con los datos del usuario
+        const newToken = jwt.createToken(user);
+        res.status(200).send({ token: newToken });
+    } else {
+        res.status(401).send({ message: 'Usuario no autenticado' });
+    }
+};
+
 module.exports = {
     registro_usuario_admin,
     login_usuario,
     listar_usuario_admin,
     obtener_usuario_admin,
     actualizar_usuario_admin,
-    cambiar_estado_usuario_admin
+    cambiar_estado_usuario_admin,
+    renovar_token
 }

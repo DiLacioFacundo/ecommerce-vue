@@ -1,17 +1,15 @@
-var jwt = require('jwt-simple');
-var moment = require('moment');
-var secret = 'diego';
+const jwt = require('jsonwebtoken');
+const secret = 'diego'; 
 
-exports.createToken = function(usuario) {
-    var payload = {
-        sub: usuario._id,
-        nombres: usuario.nombres,
-        apellidos: usuario.apellidos,
-        email: usuario.email,
-        rol: usuario.rol,
-        iat: moment().unix(), // Fecha de emisión
-        exp: moment().add(1, 'minute').unix() // Fecha de expiración
+exports.createToken = (user) => {
+    const payload = {
+        sub: user._id,
+        nombres: user.nombres,
+        apellidos: user.apellidos,
+        email: user.email,
+        rol: user.rol,
+        iat: Math.floor(Date.now() / 1000), 
+        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24), 
     };
-
-    return jwt.encode(payload, secret);
+    return jwt.sign(payload, secret);
 };

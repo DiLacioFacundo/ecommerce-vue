@@ -1,6 +1,6 @@
 const express = require('express');
 const ventasController = require('../controllers/ventasController');
-var authenticate =  require('../middlewares/authenticate')
+const authenticate =  require('../middlewares/authenticate')
 
 var router = express.Router();
 

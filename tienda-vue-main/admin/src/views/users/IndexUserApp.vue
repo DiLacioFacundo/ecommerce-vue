@@ -113,7 +113,7 @@ export default {
  
   data() {
     return {
-      image_user: '/assets/media/user.png',
+      image_user: '/assets/icons/user.png',
       usuarios:[],
       usuarios_const:[],
       load_data: false,

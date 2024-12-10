@@ -1,7 +1,7 @@
 <template>
     <div style="background: #f3f3f3;" class="pb-5">
         <!-- Sección Hero -->
-        <section class="hero text-center text-white" style="background-image: url('/assets/images/hero-background.png'); background-size: cover; background-position: center; padding: 4rem 0; margin-top: 100px;">
+        <section class="hero text-center text-white" style="background-size: cover; background-position: center; padding: 4rem 0; margin-top: 100px;">
             <div class="container">
                 <ol class="breadcrumb justify-content-center">
                     <li class="breadcrumb-item"><router-link to="/" class="text-white">Inicio</router-link></li>
@@ -67,7 +67,7 @@
                             </div>
                         </div>
                         <div class="my-5 d-flex justify-content-between flex-column flex-lg-row">
-                            <router-link class="btn btn-link text-muted" to="/shop">Continuar comprando</router-link>
+                            <router-link class="btn btn-primary" to="/shop">Continuar comprando</router-link>
                             <a class="btn btn-primary" href="/checkout">Ir a Pagar <i class="fa fa-chevron-right"></i></a>
                         </div>
                     </div>
@@ -118,7 +118,8 @@ export default {
                     .get(this.$url + '/obtener_carrito_cliente', {
                         headers: {
                             'Content-Type': 'application/json',
-                            Authorization: this.$store.state.token,
+                            Authorization: `Bearer ${this.$store.state.token}`,
+
                         },
                     })
                     .then((result) => {
@@ -135,7 +136,7 @@ export default {
                 .delete(this.$url + '/eliminar_producto_carrito/' + id, {
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: this.$store.state.token,
+                        Authorization: `Bearer ${this.$store.state.token}`
                     },
                 })
                 .then(() => {

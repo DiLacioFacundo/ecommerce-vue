@@ -1,33 +1,33 @@
-var jwt = require('jwt-simple');
-var moment = require('moment');
-var secret = 'diego';
+const jwt = require('jsonwebtoken');
+const secret = 'diego'; 
+function decodeToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
 
-exports.decodeToken = function(req, res, next) {
-    if (!req.headers.authorization) {
-        return res.status(403).send({ message: 'NoHeadersErrors' });
+    if (!authHeader) {
+        console.error('No se proporcionó el encabezado de autorización');
+        return res.status(401).json({ message: 'No se proporcionó un token de autorización' });
     }
 
-    var token = req.headers.authorization;
+    const token = authHeader.split(' ')[1];
 
-    // Verificar formato del token
-    var segments = token.split('.');
-    if (segments.length !== 3) {
-        return res.status(403).send({ message: 'InvalidToken' });
+    if (!token) {
+        return res.status(401).json({ message: 'Token no válido' });
     }
 
-    try {
-        // Decodificar el token
-        var payload = jwt.decode(token, secret);
-
-        // Verificar expiración
-        if (payload.exp <= moment().unix()) {
-            return res.status(403).send({ message: 'TokenExpired' });
+    jwt.verify(token, secret, (err, decoded) => {
+        if (err) {
+            if (err.name === 'TokenExpiredError') {
+                return res.status(401).json({ message: 'Token expirado' });
+            } else if (err.name === 'JsonWebTokenError') {
+                return res.status(401).json({ message: 'Token inválido' });
+            } else {
+                return res.status(500).json({ message: 'Error al verificar el token' });
+            }
         }
+        req.user = decoded;
+        next();
+    });
+}
 
-        req.user = payload; // Asignar el payload al objeto `req`
-        next(); // Continuar con la siguiente función
-    } catch (error) {
-        console.log('Error decoding token:', error);
-        return res.status(403).send({ message: 'ErrorToken' });
-    }
-};
+
+module.exports = { decodeToken };

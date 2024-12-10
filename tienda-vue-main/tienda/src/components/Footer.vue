@@ -19,7 +19,7 @@
             </div>
           </div>
           <div class="col-lg-4 service-column">
-            <img class="service-icon" src="/assets/media/tailandes.gif" alt="Soporte">
+            <img class="service-icon" src="/assets/media/soporte.gif" alt="Soporte">
             <div class="service-text">
               <h6 class="service-title">020-800-456-747</h6>
               <p class="service-description">Soporte disponible 24/7</p>
@@ -34,7 +34,7 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-4 mb-5 mb-lg-0">
-            <div class="footer-logo text-lg text-white mb-3">VapeShop<span class="highlight">.</span></div>
+            <div class="footer-logo text-lg text-white mb-3">VapeShop</div>
             <p class="text-white">Tu mejor tienda online de vapes y accesorios.</p>
             <ul class="social-icons list-inline">
               <li class="list-inline-item">
@@ -99,10 +99,9 @@
           </div>
           <div class="col-md-6">
             <ul class="list-inline mb-0 mt-2 mt-md-0 text-center text-md-end">
-              <li class="list-inline-item"><img class="w-2rem" src="https://d19m59y37dris4.cloudfront.net/sell/2-0/img/visa.svg" alt="Visa"></li>
-              <li class="list-inline-item"><img class="w-2rem" src="https://d19m59y37dris4.cloudfront.net/sell/2-0/img/mastercard.svg" alt="MasterCard"></li>
-              <li class="list-inline-item"><img class="w-2rem" src="https://d19m59y37dris4.cloudfront.net/sell/2-0/img/paypal.svg" alt="PayPal"></li>
-              <li class="list-inline-item"><img class="w-2rem" src="https://d19m59y37dris4.cloudfront.net/sell/2-0/img/western-union.svg" alt="Western Union"></li>
+              <li class="list-inline-item"><img class="w-2rem" src="/assets/media/visa.png" alt="Visa"></li>
+              <li class="list-inline-item"><img class="w-2rem" src="/assets/media/mastercard.png" alt="MasterCard"></li>
+              <li class="list-inline-item"><img class="w-2rem" src="/assets/media/mercado-pago.png" alt="MercadoPago"></li>
             </ul>
           </div>
         </div>
