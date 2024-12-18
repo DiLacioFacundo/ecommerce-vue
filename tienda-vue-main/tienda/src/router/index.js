@@ -1,7 +1,7 @@
 import Vue from 'vue'; // Import Vue
 import VueRouter from 'vue-router'; // Import VueRouter
 import HomeView from '../views/HomeView.vue'; // Import your views
-import jwtDecode from "jwt-decode";
+import * as jwtDecode from "jwt-decode";
 
 Vue.use(VueRouter);
 
@@ -11,7 +11,7 @@ const routes = [
     name: 'home',
     component: HomeView
   },
-  { path: '/login', name: 'login', component: () => import('@/views/LoginApp.vue')  },
+  { path: '/login', name: 'login', component: () => import('@/views/LoginApp.vue') },
   {
     path: '/shop',
     name: 'shop',
@@ -24,9 +24,7 @@ const routes = [
   {
     path: '/checkout',
     name: 'checkout',
-    component: () => import('@/views/compras/CheckoutView.vue'),
-    meta: { requiresAuth: true }
-  },
+    component: () => import('@/views/compras/CheckoutView.vue')  },
   {
     path: "/success",
     name: "Success",
@@ -35,7 +33,8 @@ const routes = [
   {
     path: '/profile',
     name: 'profile',
-    component: () => import('@/views/ProfileView.vue')  },
+    component: () => import('@/views/ProfileView.vue')
+  },
   {
     path: '/orders',
     name: 'orders',
@@ -53,49 +52,55 @@ const router = new VueRouter({
 
 // Middleware de autenticación en el frontend
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
+  // Si la ruta requiere autenticación
   if (to.matched.some((route) => route.meta.requiresAuth)) {
     if (!token) {
-      return next({ name: 'login' }); // Redirige al login si no hay token
+      // Redirige al login si no hay token
+      return next({ name: "login" });
     }
 
     try {
-      const decodedToken = jwtDecode(token); // Decodifica el token
-      console.log('Token decodificado:', decodedToken);
+      const decodedToken = jwtDecode(token);
+      console.log("Token decodificado:", decodedToken);
 
+      // Si el token ha expirado, elimina el token y redirige al login
       if (decodedToken.exp * 1000 <= Date.now()) {
-        // Si el token ha expirado, elimínalo y redirige al login
-        localStorage.removeItem('token');
-        return next({ name: 'login' });
+        localStorage.removeItem("token");
+        return next({ name: "login" });
       }
 
       // Guarda el usuario en Vuex si no está presente
       if (!router.app.$store.getters.currentUser) {
-        router.app.$store.dispatch('decodeAndSaveToken', token);
+        router.app.$store.dispatch("decodeAndSaveToken", token).then(() => {
+          return next(); // Navegación permitida después de guardar el usuario
+        });
+      } else {
+        return next(); // Navegación permitida si el usuario ya está cargado
       }
-
-      return next();
     } catch (error) {
-      console.error('Error en el token:', error);
-      localStorage.removeItem('token');
-      return next({ name: 'login' });
+      console.error("Error en el token:", error);
+      localStorage.removeItem("token");
+      return next({ name: "login" });
     }
   }
 
-  if (to.name === 'login' && token) {
+  // Si la ruta es "login" y el usuario ya está logueado
+  if (to.name === "login" && token) {
     try {
       const decodedToken = jwtDecode(token);
 
       if (decodedToken.exp * 1000 > Date.now()) {
-        return next({ name: 'home' }); // Redirige al home si el usuario ya está logueado
+        return next({ name: "home" }); // Redirige al home si el token es válido
       }
-      localStorage.removeItem('token');
+      localStorage.removeItem("token"); // Limpia el token si expiró
     } catch (error) {
-      localStorage.removeItem('token');
+      localStorage.removeItem("token"); // Limpia el token si ocurre un error
     }
   }
 
+  // Por defecto, permite la navegación
   next();
 });
 

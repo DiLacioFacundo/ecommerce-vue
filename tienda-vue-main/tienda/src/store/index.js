@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import jwtDecode from "jwt-decode";
+import * as jwtDecode from "jwt-decode";
 
 Vue.use(Vuex);
 
