@@ -79,11 +79,7 @@
                 <template v-else>
                   <!-- Formulario de edición -->
                   <form @submit.prevent="updateClientData">
-                    <div
-                      class="mb-3"
-                      v-for="key in editableFields"
-                      :key="key"
-                    >
+                    <div class="mb-3" v-for="key in editableFields" :key="key">
                       <label :for="key" class="form-label"
                         >{{ labels[key] }}:</label
                       >
@@ -103,7 +99,11 @@
                           class="form-control"
                           v-model="editedData.pais"
                         >
-                          <option v-for="pais in paises" :key="pais" :value="pais">
+                          <option
+                            v-for="pais in paises"
+                            :key="pais"
+                            :value="pais"
+                          >
                             {{ pais }}
                           </option>
                         </select>
@@ -246,10 +246,20 @@ export default {
         estado: "fas fa-user-check",
       },
       editableFields: ["nombres", "email", "genero", "pais", "estado"],
-      paises: ["Argentina", "Brasil", "Chile", "Colombia", "Perú", "México", "Estados Unidos", "España"],
+      paises: [
+        "Argentina",
+        "Brasil",
+        "Chile",
+        "Colombia",
+        "Perú",
+        "México",
+        "Estados Unidos",
+        "España",
+      ],
     };
   },
   computed: {
+
     currentUser() {
       return this.$store.getters.currentUser || {};
     },

@@ -50,6 +50,7 @@
 </template>
 <script>
 import axios from "axios";
+import { mapGetters } from "vuex"; // Para integrar con Vuex
 
 export default {
   data() {
@@ -58,15 +59,16 @@ export default {
     };
   },
   computed: {
+
     currentUser() {
       return this.$store.getters.currentUser || {};
     },
   },
   methods: {
-    async fetchOrders() {
-      try {
+  async fetchOrders() {
+   /*     try {
         const response = await axios.get(
-          `/api/orders/${this.currentUser.id}`,
+        //`${this.$url}/orders/${this.currentUser.id}`, // Asegúrate de que this.$url esté definido
           {
             headers: { Authorization: `Bearer ${this.$store.state.token}` },
           }
@@ -75,7 +77,7 @@ export default {
       } catch (error) {
         console.error("Error al obtener órdenes:", error);
         this.$toast.error("No se pudieron cargar las órdenes.");
-      }
+      }*/
     },
     formatDate(dateString) {
       const options = { year: "numeric", month: "long", day: "numeric" };

@@ -23,6 +23,15 @@
       </div>
     </section>
 
+    <!-- Notificación -->
+    <Notificacion
+      v-if="notificacion.visible"
+      :message="notificacion.message"
+      :type="notificacion.type"
+      :duration="notificacion.duration"
+      @close="notificacion.visible = false"
+    />
+
     <!-- Sección de Login y Registro -->
     <section>
       <div class="container py-5">
@@ -182,9 +191,13 @@
 
 <script>
 import axios from "axios";
+import Notificacion from "@/components/Notificacion.vue";
 
 export default {
   name: "LoginApp",
+  components: {
+    Notificacion,
+  },
   data() {
     return {
       cliente: {
@@ -200,9 +213,26 @@ export default {
       password: "",
       msm_error: "",
       msm_error_login: "",
+      notificacion: {
+        visible: false,
+        message: "",
+        type: "",
+        duration: 3000,
+      },
     };
   },
   methods: {
+    showNotification(message, type) {
+      this.notificacion = {
+        visible: true,
+        message,
+        type,
+        duration: 3000,
+      };
+      setTimeout(() => {
+        this.notificacion.visible = false;
+      }, this.notificacion.duration);
+    },
     validar_registro() {
       if (!this.cliente.nombres) {
         this.msm_error = "Por favor, ingresa tu nombre completo.";
@@ -222,7 +252,7 @@ export default {
           })
           .then((result) => {
             if (result.data.message) {
-              this.msm_error = result.data.message;
+              this.showNotification(result.data.message, "error");
             } else {
               this.$store.dispatch("saveToken", result.data.token);
               this.$store.dispatch("saveUser", result.data.cliente);
@@ -231,7 +261,10 @@ export default {
           })
           .catch((error) => {
             console.error(error);
-            this.msm_error = "Ocurrió un error. Inténtalo nuevamente.";
+            this.showNotification(
+              "Ocurrió un error. Inténtalo nuevamente.",
+              "error"
+            );
           });
       }
     },
@@ -252,8 +285,9 @@ export default {
           })
           .then((result) => {
             if (result.data.message) {
-              this.msm_error_login = result.data.message;
+              this.showNotification(result.data.message, "error");
             } else {
+              this.showNotification("Inicio de sesión exitoso.", "success");
               this.$store.dispatch("saveToken", result.data.token);
               this.$store.dispatch("saveUser", result.data.cliente);
               this.$router.push({ name: "home" });
@@ -261,8 +295,10 @@ export default {
           })
           .catch((error) => {
             console.error(error);
-            this.msm_error_login =
-              "Error al iniciar sesión. Verifica tus credenciales.";
+            this.showNotification(
+              "Error al iniciar sesión. Verifica tus credenciales.",
+              "error"
+            );
           });
       }
     },
@@ -454,7 +490,6 @@ export default {
   },
 };
 </script>
-
 
 <style>
 .hero {
