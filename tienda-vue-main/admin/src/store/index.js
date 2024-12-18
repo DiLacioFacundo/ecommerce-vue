@@ -11,11 +11,18 @@ export default new Vuex.Store({
     setToken(state, token) {
       state.token = token;
     },
+    resetUserState(state) {
+      state.token = null;
+      localStorage.removeItem('token'); 
+    },
   },
   actions: {
     saveToken({ commit }, token) {
       commit('setToken', token);
       localStorage.setItem('token', token);
+    },
+    resetUserState({ commit }) {
+      commit('resetUserState');
     },
   },
   getters: {
@@ -24,3 +31,4 @@ export default new Vuex.Store({
     },
   },
 });
+

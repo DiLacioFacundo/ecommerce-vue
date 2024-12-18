@@ -9,7 +9,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.1",
     "axios": "^0.27.2",
-    "bootstrap-vue": "^2.22.0",
+    "bootstrap-vue": "^2.23.1",
     "currency-formatter": "^1.5.9",
     "jquery": "^3.6.0",
     "jwt-decode": "^4.0.0",

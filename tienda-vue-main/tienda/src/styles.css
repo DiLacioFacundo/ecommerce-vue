@@ -1,0 +1,222 @@
+.btn {
+  display: inline-block;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease, transform 0.2s ease; /* Transiciones suaves */
+  cursor: pointer;
+}
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.25rem;
+}
+/* BTN PRIMARIO */
+.btn-primary {
+  color: #ffffff;
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.btn-primary:active {
+  background-color: #003d80;
+  border-color: #003d80;
+  transform: scale(0.95);
+}
+
+.btn-primary:focus {
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+  outline: none;
+}
+
+/* BTN SECUNDARIO */
+.btn-secondary {
+  background-color: #6c757d;
+  color: #ffffff;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+
+.btn-secondary:active {
+  background-color: #4e555b;
+  border-color: #4e555b;
+  transform: scale(0.95);
+}
+
+/* BTN SUCCESS */
+.btn-success {
+  background-color: #28a745;
+  color: #ffffff;
+  border-color: #28a745;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+.btn-success:active {
+  background-color: #1c7430;
+  border-color: #1c7430;
+  transform: scale(0.95);
+}
+
+/* BTN DANGER */
+.btn-danger {
+  background-color: #dc3545;
+  color: #ffffff;
+  border-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+.btn-danger:active {
+  background-color: #b02a37;
+  border-color: #a71d2a;
+  transform: scale(0.95);
+}
+
+/* BTN WARNING */
+.btn-warning {
+  background-color: #ffc107;
+  color: #212529;
+  border-color: #ffc107;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+  border-color: #d39e00;
+}
+
+.btn-warning:active {
+  background-color: #c69500;
+  border-color: #c69500;
+  transform: scale(0.95);
+}
+
+/* BTN INFO */
+.btn-info {
+  background-color: #17a2b8;
+  color: #ffffff;
+  border-color: #17a2b8;
+}
+
+.btn-info:hover {
+  background-color: #138496;
+  border-color: #117a8b;
+}
+
+.btn-info:active {
+  background-color: #0f6f79;
+  border-color: #0e6571;
+  transform: scale(0.95);
+}
+
+/* BTN LIGHT */
+.btn-light {
+  background-color: #f8f9fa;
+  color: #212529;
+  border-color: #f8f9fa;
+}
+
+.btn-light:hover {
+  background-color: #e2e6ea;
+  border-color: #dae0e5;
+}
+
+.btn-light:active {
+  background-color: #dae0e5;
+  border-color: #c8ced3;
+  transform: scale(0.95);
+}
+
+/* BTN DARK */
+.btn-dark {
+  background-color: #343a40;
+  color: #ffffff;
+  border-color: #343a40;
+}
+
+.btn-dark:hover {
+  background-color: #23272b;
+  border-color: #1d2124;
+}
+
+.btn-dark:active {
+  background-color: #1d2124;
+  border-color: #171a1d;
+  transform: scale(0.95);
+}
+/* Personalización del botón Dropdown */
+.btn-outline-secondary {
+  color: #ffffff; /* Texto blanco */
+  background-color: #007bff; /* Azul Bootstrap */
+  border-color: #007bff; /* Borde azul */
+  transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+  color: #ffffff; /* Texto blanco */
+  background-color: #001d3d; /* Azul más oscuro */
+  border-color: #001d3d; /* Borde más oscuro */
+}
+
+.btn-outline-secondary:active {
+  color: #ffffff; /* Texto blanco */
+  background-color: #001d3d; /* Azul aún más oscuro */
+  border-color: #001d3d; /* Borde más oscuro */
+  transform: scale(0.95); /* Efecto de presión */
+}
+
+.btn-outline-secondary:focus {
+  box-shadow: 0 0 5px rgba(1, 56, 114, 0.5); /* Sombra azul al enfocar */
+  outline: none;
+}
+
+/* ESTILOS ÍCONOS DENTRO DEL BOTÓN */
+.btn i {
+  transition: transform 0.2s ease;
+}
+
+.btn:hover i {
+  transform: scale(1.1); /* Crecimiento del ícono */
+}
+
+/* ANIMACIONES */
+.btn:active {
+  transform: scale(0.95); /* Efecto de presión */
+}
+
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Sombra al enfocar */
+}
+
+/* DESACTIVADO */
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+
+/* Form elements */
+.form-label {
+  font-weight: bold;
+  color: #495057;
+  font-size: 12px; /* Aumenta el tamaño de la etiqueta */
+}

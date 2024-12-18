@@ -221,15 +221,81 @@ const obtener_categoria_admin = async (req, res) => {
     }
 };
 
+const obtener_categoria_sin_categoria = async (req, res) => {
+    try {
+        const sinCategoria = await obtenerCategoriaSinCategoria();
+        return res.status(200).send({ data: sinCategoria, message: 'Categoría "Sin categoría" obtenida exitosamente.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ data: undefined, message: 'Error al obtener "Sin categoría".' });
+    }
+};
+
+const obtener_subcategoria_sin_subcategoria = async (req, res) => {
+    try {
+        const categoriaId = req.params['categoriaId'];
+        const sinSubcategoria = await obtenerSubcategoriaSinSubcategoria(categoriaId);
+
+        return res.status(200).send({
+            data: sinSubcategoria,
+            message: 'Subcategoría "Sin Subcategorías" obtenida exitosamente.',
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            data: undefined,
+            message: 'Error al obtener "Sin Subcategorías".',
+        });
+    }
+};
 const obtenerCategoriaSinCategoria = async () => {
-    let sinCategoria = await Categoria.findOne({ titulo: "Sin categoría" });
+    let sinCategoria = await Categoria.findOne({ titulo: "Sin Categoría" });
 
     if (!sinCategoria) {
         // Crear la categoría "Sin categoría" si no existe
-        sinCategoria = await Categoria.create({ titulo: "Sin categoría" });
+        sinCategoria = await Categoria.create({ titulo: "Sin Categoría" });
+
+        // Crear la subcategoría "Sin subcategorías" dentro de esta categoría
+        await Subcategoria.create({
+            categoria: sinCategoria._id,
+            titulo: "Sin Subcategorías",
+        });
+    } else {
+        // Verificar si la subcategoría "Sin Subcategorías" ya existe
+        const sinSubcategoria = await Subcategoria.findOne({
+            categoria: sinCategoria._id,
+            titulo: "Sin Subcategorías",
+        });
+
+        if (!sinSubcategoria) {
+            // Crear la subcategoría "Sin subcategorías" si no existe
+            await Subcategoria.create({
+                categoria: sinCategoria._id,
+                titulo: "Sin Subcategorías",
+            });
+        }
     }
 
     return sinCategoria;
+};
+
+
+const obtenerSubcategoriaSinSubcategoria = async (categoriaId) => {
+    // Buscar una subcategoría llamada "Sin subcategorías" dentro de la categoría especificada
+    let sinSubcategoria = await Subcategoria.findOne({
+        categoria: categoriaId,
+        titulo: "Sin Subcategorías",
+    });
+
+    if (!sinSubcategoria) {
+        // Crear la subcategoría "Sin subcategorías" si no existe
+        sinSubcategoria = await Subcategoria.create({
+            categoria: categoriaId,
+            titulo: "Sin Subcategorías",
+        });
+    }
+
+    return sinSubcategoria;
 };
 
 module.exports = {
@@ -241,5 +307,7 @@ module.exports = {
     listar_subcategorias_por_categoria_admin,
     eliminar_subcategoria_admin,
     actualizar_subcategoria_admin,
-    obtener_categoria_admin
+    obtener_categoria_admin,
+    obtener_categoria_sin_categoria,
+    obtener_subcategoria_sin_subcategoria
 };

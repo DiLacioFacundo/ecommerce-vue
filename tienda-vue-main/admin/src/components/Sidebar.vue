@@ -9,13 +9,22 @@
       <!-- Navigation -->
       <ul class="navbar-nav mt-4">
         <li class="nav-item">
-          <router-link to="/categorias" class="nav-link" active-class="active">
-            <i class="fe fe-layers"></i>
-            <span>Categorías</span>
-          </router-link>
+          <!-- Abrir "E-commerce" en una nueva pestaña -->
+          <a @click="openEcommerce" class="nav-link">
+            <i class="fe fe-globe"></i>
+            <span>E-commerce</span>
+          </a>
+        </li>
+        <li class="nav-item">
           <router-link to="/producto" class="nav-link" active-class="active">
             <i class="fe fe-shopping-cart"></i>
             <span>Productos</span>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/categorias" class="nav-link" active-class="active">
+            <i class="fe fe-layers"></i>
+            <span>Categorías</span>
           </router-link>
         </li>
         <li class="nav-item">
@@ -25,14 +34,13 @@
           </router-link>
         </li>
         <li class="nav-item">
-          <!-- Abrir "E-commerce" en una nueva pestaña -->
-          <a @click="openEcommerce" class="nav-link">
-            <i class="fe fe-globe"></i>
-            <span>E-commerce</span>
-          </a>
+          <router-link to="/usuario" class="nav-link" active-class="active">
+            <i class="fe fe-user"></i>
+            <span>Usuarios</span>
+          </router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/clientes" class="nav-link" active-class="active">
+          <router-link to="/cliente" class="nav-link" active-class="active">
             <i class="fe fe-user"></i>
             <span>Clientes</span>
           </router-link>

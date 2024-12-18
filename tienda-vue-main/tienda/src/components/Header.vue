@@ -213,7 +213,9 @@
                 data-bs-toggle="dropdown"
               >
                 <i class="fas fa-user"></i>
-                {{ user ? user.nombres.split(" ")[0] : "Usuario" }}
+                {{
+                  user && user.nombres ? user.nombres.split(" ")[0] : "Usuario"
+                }}
               </a>
               <div class="dropdown-menu dropdown-menu-end">
                 <router-link class="dropdown-item" :to="{ name: 'profile' }"
@@ -241,55 +243,62 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex";
-import axios from "axios";
+import { mapGetters } from "vuex"; // Para integrar con Vuex
+import { EventBus } from "@/utils/eventBus";
 
 export default {
   name: "Header",
   data() {
     return {
-      carrito: [],
-      carrito_length: 0,
+      carrito_length: 0, // Contador de productos en el carrito
     };
   },
   computed: {
-    ...mapState(["token"]),
-    ...mapGetters(["currentUser", "isLoggedIn"]),
+    ...mapGetters(["isLoggedIn", "currentUser", "cartLength"]),
     user() {
-      return this.currentUser; // Obtener el usuario actual desde Vuex
+      return this.currentUser; // Alias para el usuario actual
     },
   },
   methods: {
+    // Inicializa el carrito y calcula el contador
     initCarrito() {
-      if (this.token) {
-        axios
-          .get(`${this.$url}/obtener_carrito_cliente`, {
-            headers: { Authorization: `Bearer ${this.$store.state.token}` },
-          })
-          .then((response) => {
-            this.carrito = response.data.carrito || [];
-            this.carrito_length = this.carrito.length;
-          })
-          .catch((err) => {
-            if (err.response && err.response.status === 401) {
-              this.logout();
-            }
-          });
-      }
+      const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+      this.carrito_length = carrito.reduce(
+        (total, item) => total + (item.cantidad || 0),
+        0
+      );
     },
+    // Limpia el carrito y reinicia el contador
+    limpiarCarrito() {
+      localStorage.removeItem("carrito");
+      this.carrito_length = 0; // Reinicia el contador
+    },
+    // Cerrar sesión
     logout() {
-      this.$store.dispatch("logout"); // Limpiar token y usuario desde Vuex
-      this.carrito = [];
-      this.carrito_length = 0;
-      this.$router.push({ name: "home" }); // Redirigir al usuario a la página de inicio
+      this.$store
+        .dispatch("logout") // Acción de Vuex para cerrar sesión
+        .then(() => {
+          this.$router.push("/login"); // Redirige a la página de inicio de sesión
+        })
+        .catch((error) => {
+          console.error("Error al cerrar sesión:", error);
+        });
     },
   },
   mounted() {
-    this.initCarrito(); // Inicializar el carrito si hay un token
+    this.initCarrito(); // Inicializa el carrito al montar el componente
+
+    // Escucha el evento "carrito-actualizado" del EventBus
+    EventBus.$on("carrito-actualizado", (nuevoContador) => {
+      this.carrito_length = nuevoContador;
+    });
+  },
+  beforeDestroy() {
+    // Elimina el listener del EventBus al destruir el componente
+    EventBus.$off("carrito-actualizado");
   },
 };
 </script>
-
 
 <style>
 .navbar-light .navbar-nav .nav-link,

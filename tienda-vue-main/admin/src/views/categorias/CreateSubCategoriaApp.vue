@@ -106,10 +106,13 @@ export default {
         );
         this.categoriaNombre = response.data.data.titulo;
       } catch (error) {
-        this.showNotification(
-          "No se pudo cargar la información de la categoría. Intenta nuevamente.",
-          "error"
-        );
+        // Verificar si hay un mensaje de error del servidor
+        const errorMessage =
+          error.response && error.response.data && error.response.data.message
+            ? error.response.data.message
+            : "No se pudo cargar la información de la categoría. Intenta nuevamente.";
+        // Mostrar el mensaje del servidor como notificación
+        this.showNotification(errorMessage, "error");
       }
     },
     async crearSubcategoria() {

@@ -25,6 +25,10 @@ router.delete(
     categoriaController.eliminar_categoria_admin
 );
 
+router.get('/obtener_categoria_sin_categoria',
+    authenticate.decodeToken,
+    categoriaController.obtener_categoria_sin_categoria);
+
 // Subcategorías
 router.post(
     '/registrar_subcategoria_admin',
@@ -48,4 +52,7 @@ router.get('/obtener_categoria_admin/:id', authenticate.decodeToken,
 router.put('/actualizar_subcategoria_admin/:id', authenticate.decodeToken,
     categoriaController.actualizar_subcategoria_admin);
 
+    router.put('/obtener_subcategoria_sin_subcategoria/:id', authenticate.decodeToken,
+        categoriaController.obtener_subcategoria_sin_subcategoria);
+    
 module.exports = router;

@@ -1,42 +1,44 @@
 <template>
   <div>
-    <!-- Sidebar -->
     <Sidebar />
-
-    <!-- Main Content -->
     <div class="main-content">
       <TopNav />
+      <!-- Notificación -->
+      <notificacion
+        v-if="notificationVisible"
+        :message="notificationMessage"
+        :type="notificationType"
+        @close="notificationVisible = false"
+      ></notificacion>
       <div class="container-fluid">
         <div class="row justify-content-center">
-          <div class="col-12 col-lg-10 col-xl-8">
+          <div class="col-12 col-lg-10 col-xl-8" style="width: 100%">
             <!-- Header -->
-            <div class="header mt-md-5">
-              <div class="header-body">
-                <div class="header mt-md-5">
-                  <div class="header-body text-center">
-                    <div class="row align-items-center">
-                      <div class="col">
-                        <h6 class="header-pretitle">Productos</h6>
-                        <h1 class="header-title">
-                          <i class="fas fa-box-open me-2 text-primary"></i> Editar Productos
-                        </h1>
-                      </div>
-                    </div>
+            <div class="header mt-md-3">
+              <div class="header-body text-center">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <h6 class="header-pretitle">Productos</h6>
+                    <h1 class="header-title">
+                      <i class="fas fa-boxes me-2 text-primary"></i> Editar
+                      Producto
+                    </h1>
                   </div>
                 </div>
                 <div class="row align-items-center mt-3">
                   <div class="col">
-                    <ul class="nav nav-tabs nav-overflow header-tabs">
+                    <ul
+                      class="nav nav-tabs nav-overflow header-tabs justify-content-center"
+                    >
                       <li class="nav-item">
                         <router-link to="/producto" class="nav-link">
-                          <i class="fas fa-list-alt me-1"></i> Todos los
-                          Productos
+                          <i class="fas fa-list-alt me-1"></i> Listar Productos
                         </router-link>
                       </li>
                       <li class="nav-item">
-                        <a class="nav-link active">
+                        <router-link to="#" class="nav-link active">
                           <i class="fas fa-edit me-1"></i> Editar Producto
-                        </a>
+                        </router-link>
                       </li>
                     </ul>
                   </div>
@@ -45,145 +47,249 @@
             </div>
 
             <!-- Formulario -->
-            <div class="card shadow-sm mt-4">
+            <div class="card shadow-sm">
               <div class="card-body">
-                <div class="row mb-4">
-                  <div class="col-auto">
-                    <!-- Avatar -->
-                    <div class="avatar">
+                <!-- Galería de Imágenes -->
+                <div class="gallery-container mb-4">
+                  <h5 class="fw-semibold text-center gallery-title">
+                    <i class="fas fa-images me-2 text-primary"></i> Galería de
+                    Imágenes
+                  </h5>
+                  <div class="image-gallery">
+                    <!-- Imágenes existentes -->
+                    <div
+                      class="image-placeholder"
+                      v-for="(imagen, index) in producto.imagenes"
+                      :key="'existente-' + index"
+                    >
                       <img
-                        class="avatar-img rounded-circle shadow"
-                        :src="str_image"
-                        alt="Portada"
+                        :src="imagen"
+                        class="img-thumbnail"
+                        alt="Imagen existente"
+                      />
+                      <button
+                        type="button"
+                        class="btn btn-danger btn-sm mt-2"
+                        @click="eliminarImagenExistente(index)"
+                      >
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                      </button>
+                    </div>
+
+                    <!-- Nuevas imágenes -->
+                    <div
+                      class="image-placeholder"
+                      v-for="(imagen, index) in nuevasImagenes"
+                      :key="'nueva-' + index"
+                    >
+                      <img
+                        :src="imagen.preview"
+                        class="img-thumbnail"
+                        alt="Imagen nueva"
+                      />
+                      <button
+                        type="button"
+                        class="btn btn-danger btn-sm mt-2"
+                        @click="eliminarImagenNueva(index)"
+                      >
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                      </button>
+                    </div>
+                    <!-- Espacios para agregar más imágenes -->
+                    <div
+                      class="image-placeholder"
+                      v-for="index in espaciosRestantes"
+                      :key="'espacio-' + index"
+                    >
+                      <img
+                        src="/assets/images/no_image.png"
+                        class="img-thumbnail"
+                        alt="Sin imagen"
+                      />
+                      <label
+                        :for="'upload-image-' + index"
+                        class="btn btn-primary btn-sm mt-2"
+                      >
+                        <i class="fas fa-upload"></i> Agregar
+                      </label>
+                      <input
+                        :id="'upload-image-' + index"
+                        type="file"
+                        accept="image/*"
+                        style="display: none"
+                        @change="uploadNuevaImagen($event)"
                       />
                     </div>
                   </div>
-                  <div class="col ms-n2">
-                    <h4 class="mb-1">Portada</h4>
-                    <small class="text-muted">PNG o JPG no mayor a 1MB.</small>
-                  </div>
-                  <div class="col-auto">
-                    <label for="file-upload" class="btn btn-sm btn-primary">
-                      <i class="fas fa-upload me-1"></i> Cargar Imagen
-                    </label>
-                    <input
-                      style="display: none"
-                      id="file-upload"
-                      type="file"
-                      @change="uploadImage($event)"
-                    />
-                  </div>
+                  <small class="text-muted d-block text-center mt-3">
+                    Máximo de 5 imágenes. Formatos soportados: JPEG, PNG. Tamaño
+                    máximo por imagen: 1MB.
+                  </small>
                 </div>
 
+                <!-- Campos del Formulario -->
                 <form @submit.prevent="validarCampos">
                   <div class="row">
-                    <!-- Título -->
-                    <div class="col-12 col-md-6 mb-3">
-                      <label class="form-label">
-                        <i class="fas fa-tag me-1"></i> Título del Producto
-                      </label>
-                      <small class="form-text text-muted"
-                        >Debe ser único.</small
-                      >
+                    <div class="col-12 col-md-6 mb-4">
+                      <label class="form-label fw-semibold">Título</label>
                       <input
                         type="text"
-                        class="form-control shadow-sm"
+                        class="form-control input-custom"
                         placeholder="Título del producto"
                         v-model="producto.titulo"
+                        :class="{ 'is-invalid': validationErrors.titulo }"
                       />
+                      <div
+                        v-if="validationErrors.titulo"
+                        class="invalid-feedback"
+                      >
+                        {{ validationErrors.titulo }}
+                      </div>
                     </div>
 
-                    <!-- Variedad -->
-                    <div class="col-12 col-md-6 mb-3">
-                      <label class="form-label">
-                        <i class="fas fa-leaf me-1"></i> Variedad
-                      </label>
-                      <input
-                        type="text"
-                        class="form-control shadow-sm"
-                        placeholder="Variedad del producto"
-                        v-model="producto.str_variedad"
-                      />
+                    <div class="col-12 col-md-6 mb-4">
+                      <label class="form-label fw-semibold">Categoría</label>
+                      <select
+                        class="form-select input-custom"
+                        v-model="producto.categoria"
+                        @change="fetchSubcategorias(producto.categoria)"
+                        :class="{ 'is-invalid': validationErrors.categoria }"
+                      >
+                        <option value="" disabled selected>
+                          Seleccionar Categoría
+                        </option>
+                        <option
+                          v-for="cat in categorias"
+                          :key="cat.id"
+                          :value="cat.id"
+                        >
+                          {{ cat.titulo }}
+                        </option>
+                      </select>
+                      <div
+                        v-if="validationErrors.categoria"
+                        class="invalid-feedback"
+                      >
+                        {{ validationErrors.categoria }}
+                      </div>
                     </div>
 
-                    <!-- Precio -->
-                    <div class="col-12 col-md-6 mb-3">
-                      <label class="form-label">
-                        <i class="fas fa-dollar-sign me-1"></i> Precio
-                      </label>
+                    <div class="col-12 col-md-6 mb-4">
+                      <label class="form-label fw-semibold">Subcategoría</label>
+                      <select
+                        class="form-select input-custom"
+                        v-model="producto.subcategoria"
+                        :class="{ 'is-invalid': validationErrors.subcategoria }"
+                      >
+                        <option value="" disabled selected>
+                          Seleccionar Subcategoría
+                        </option>
+                        <option
+                          v-for="subcat in subcategorias"
+                          :key="subcat.id"
+                          :value="subcat.id"
+                        >
+                          {{ subcat.titulo }}
+                        </option>
+                      </select>
+                      <div
+                        v-if="validationErrors.subcategoria"
+                        class="invalid-feedback"
+                      >
+                        {{ validationErrors.subcategoria }}
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 mb-4">
+                      <label class="form-label fw-semibold">Precio</label>
                       <input
                         type="number"
-                        class="form-control shadow-sm"
-                        placeholder="Precio del producto"
+                        class="form-control input-custom"
+                        placeholder="Precio"
                         v-model="producto.precio"
-                        readonly
+                        :class="{ 'is-invalid': validationErrors.precio }"
                       />
+                      <div
+                        v-if="validationErrors.precio"
+                        class="invalid-feedback"
+                      >
+                        {{ validationErrors.precio }}
+                      </div>
                     </div>
 
-                    <!-- Extracto -->
-                    <div class="col-12 mb-3">
-                      <label class="form-label">
-                        <i class="fas fa-align-left me-1"></i> Extracto
-                      </label>
+                    <div class="col-12 col-md-6 mb-4">
+                      <label class="form-label fw-semibold">Stock</label>
+                      <input
+                        type="number"
+                        class="form-control input-custom"
+                        placeholder="Stock disponible"
+                        v-model="producto.stock"
+                        :class="{ 'is-invalid': validationErrors.stock }"
+                      />
+                      <div
+                        v-if="validationErrors.stock"
+                        class="invalid-feedback"
+                      >
+                        {{ validationErrors.stock }}
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 mb-4">
+                      <label class="form-label fw-semibold">Variedad</label>
+                      <input
+                        type="text"
+                        class="form-control input-custom"
+                        placeholder="Variedad del producto"
+                        v-model="producto.str_variedad"
+                        :class="{ 'is-invalid': validationErrors.str_variedad }"
+                      />
+                      <div
+                        v-if="validationErrors.str_variedad"
+                        class="invalid-feedback"
+                      >
+                        {{ validationErrors.str_variedad }}
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 mb-4">
+                      <label class="form-label fw-semibold"
+                        >Descuento (%)</label
+                      >
+                      <input
+                        type="number"
+                        class="form-control input-custom"
+                        placeholder="Descuento en porcentaje"
+                        v-model="producto.descuento"
+                        :class="{ 'is-invalid': validationErrors.descuento }"
+                      />
+                      <div
+                        v-if="validationErrors.descuento"
+                        class="invalid-feedback"
+                      >
+                        {{ validationErrors.descuento }}
+                      </div>
+                    </div>
+                    <div class="col-12 mb-4">
+                      <label class="form-label fw-semibold">Descripcion</label>
                       <textarea
-                        class="form-control shadow-sm"
-                        rows="3"
-                        placeholder="Descripción breve del producto"
+                        class="form-control input-custom"
+                        rows="4"
+                        placeholder="Descripcion del producto"
                         v-model="producto.extracto"
+                        :class="{ 'is-invalid': validationErrors.extracto }"
                       ></textarea>
-                    </div>
-                  </div>
-
-                  <!-- Switches -->
-                  <div class="row">
-                    <div class="col-12 col-md-6 mb-3">
-                      <label class="form-label">
-                        <i class="fas fa-bullhorn me-1"></i> Producto Publicado
-                      </label>
-                      <small class="form-text text-muted">
-                        Selecciona el estado de publicación.
-                      </small>
-                      <div class="form-check form-switch">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          id="switchPublicado"
-                          v-model="producto.estado"
-                        />
-                        <label class="form-check-label" for="switchPublicado">
-                          {{ producto.estado ? "Publicado" : "Borrador" }}
-                        </label>
-                      </div>
-                    </div>
-                    <div class="col-12 col-md-6 mb-3">
-                      <label class="form-label">
-                        <i class="fas fa-percent me-1"></i> En Descuento
-                      </label>
-                      <small class="form-text text-muted">
-                        Indica si tiene descuento.
-                      </small>
-                      <div class="form-check form-switch">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          id="switchDescuento"
-                          v-model="producto.descuento"
-                        />
-                        <label class="form-check-label" for="switchDescuento">
-                          {{
-                            producto.descuento
-                              ? "Con Descuento"
-                              : "Sin Descuento"
-                          }}
-                        </label>
+                      <div
+                        v-if="validationErrors.extracto"
+                        class="invalid-feedback"
+                      >
+                        {{ validationErrors.extracto }}
                       </div>
                     </div>
                   </div>
 
-                  <!-- Botón -->
                   <div class="text-center">
-                    <button class="btn btn-primary btn-hover" type="submit">
-                      <i class="fas fa-save me-1"></i> Guardar Cambios
+                    <button type="submit" class="btn btn-success btn-hover">
+                      <i class="fas fa-save me-2"></i> Guardar Cambios
                     </button>
                   </div>
                 </form>
@@ -195,126 +301,244 @@
     </div>
   </div>
 </template>
-
-
 <script>
 import axios from "axios";
 import Sidebar from "@/components/Sidebar.vue";
 import TopNav from "@/components/TopNav.vue";
-import { mapState } from "vuex";
+import Notificacion from "@/components/Notificacion.vue";
 
 export default {
   name: "EditProductoApp",
   components: {
     Sidebar,
     TopNav,
+    Notificacion,
   },
   data() {
     return {
-      str_image: "/assets/images/no_image.png",
       producto: {
         titulo: "",
         categoria: "",
-        precio: 0,
+        subcategoria: "",
+        precio: null,
+        stock: null,
         extracto: "",
-        estado: true,
-        descuento: false,
-        portada: null,
+        estado: null,
+        descuento: 0,
         str_variedad: "",
+        imagenes: [], // Imágenes existentes
       },
-      portada: null,
-      variedad: {
-        proveedor: "",
-        variedad: "",
-        stock: 0,
-      },
-      variedades: [],
+      nuevasImagenes: [], // Imágenes nuevas agregadas
+      categorias: [],
+      subcategorias: [],
+      validationErrors: {},
+      notificationVisible: false,
+      notificationMessage: "",
+      notificationType: "info",
+      maxImages: 5,
     };
   },
-  computed: {
-    ...mapState(["apiUrl"]),
-  },
   methods: {
+    // Mostrar notificaciones
+    showNotification(message, type, duration = 3000) {
+      this.notificationMessage = message;
+      this.notificationType = type;
+      this.notificationVisible = true;
+
+      setTimeout(() => {
+        this.notificationVisible = false;
+      }, duration);
+    },
+    // Inicializar datos
     async init_data() {
       try {
         const response = await axios.get(
-          `${this.apiUrl}/obtener_producto_admin/${this.$route.params.id}`,
+          `${this.$url}/obtener_producto_admin/${this.$route.params.id}`,
           {
             headers: { Authorization: `Bearer ${this.$store.state.token}` },
           }
         );
-        this.producto = response.data;
-        this.str_image = `${this.apiUrl}/obtener_portada_producto/${this.producto.portada}`;
-        this.init_variedades();
+
+        if (response.data && response.data.data) {
+          this.producto = response.data.data;
+
+          // Normalizar las rutas de las imágenes
+          this.producto.imagenes = this.producto.imagenes.map((img) => {
+            if (!img.startsWith("http")) {
+              return `${this.$url}${img}`; // Añade la base URL si falta
+            }
+            return img; // Mantén las rutas completas tal cual están
+          });
+
+          await this.fetchCategorias();
+          if (this.producto.categoria) {
+            await this.fetchSubcategorias(this.producto.categoria);
+          }
+        } else {
+          throw new Error("Producto no encontrado.");
+        }
       } catch (error) {
-        console.error("Error al cargar los datos del producto:", error);
-        this.$notify({
-          group: "foo",
-          title: "Error",
-          text: "Error al cargar el producto.",
-          type: "error",
-        });
+        this.showNotification(
+          "Error al cargar los datos del producto.",
+          "danger"
+        );
+        this.$router.push({ name: "producto-index" });
       }
     },
-    uploadImage(event) {
+    // Cargar categorías
+    async fetchCategorias() {
+      try {
+        const response = await axios.get(
+          `${this.$url}/listar_categorias_admin`,
+          {
+            headers: { Authorization: `Bearer ${this.$store.state.token}` },
+          }
+        );
+
+        if (Array.isArray(response.data.categorias)) {
+          this.categorias = response.data.categorias.map((cat) => ({
+            id: cat.categoria._id,
+            titulo: cat.categoria.titulo,
+          }));
+        }
+      } catch (error) {
+        this.showNotification("Error al cargar las categorías.", "danger");
+      }
+    },
+    // Cargar subcategorías basadas en categoría
+    async fetchSubcategorias(categoriaId) {
+      try {
+        const response = await axios.get(
+          `${this.$url}/listar_subcategorias_por_categoria_admin/${categoriaId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${this.$store.state.token}`,
+            },
+          }
+        );
+
+        if (Array.isArray(response.data.data)) {
+          this.subcategorias = response.data.data.map((subcat) => ({
+            id: subcat._id,
+            titulo: subcat.titulo,
+          }));
+        } else {
+          this.subcategorias = [];
+        }
+      } catch (error) {
+        this.showNotification("Error al cargar subcategorías.", "danger");
+      }
+    },
+    // Subir nueva imagen
+    uploadNuevaImagen(event) {
       const image = event.target.files[0];
+
       if (!image) return;
 
+      if (
+        this.nuevasImagenes.length + this.producto.imagenes.length >=
+        this.maxImages
+      ) {
+        this.validationErrors.imagenes = `Solo puedes cargar un máximo de ${this.maxImages} imágenes.`;
+        return;
+      }
+
       if (image.size > 1024 * 1024) {
-        this.$notify({
-          group: "foo",
-          title: "Error",
-          text: "La imagen debe pesar menos de 1MB.",
-          type: "error",
-        });
+        this.validationErrors.imagenes = "Cada imagen debe pesar menos de 1MB.";
         return;
       }
 
-      const validFormats = ["image/jpeg", "image/png", "image/webp"];
-      if (!validFormats.includes(image.type)) {
-        this.$notify({
-          group: "foo",
-          title: "Error",
-          text: "Formato de imagen no válido. Use JPEG, PNG o WEBP.",
-          type: "error",
-        });
+      if (!["image/jpeg", "image/png"].includes(image.type)) {
+        this.validationErrors.imagenes =
+          "Formato de imagen no válido. Use JPEG o PNG.";
         return;
       }
 
-      this.str_image = URL.createObjectURL(image);
-      this.portada = image;
+      const preview = URL.createObjectURL(image);
+      this.nuevasImagenes.push({ file: image, preview });
+      this.validationErrors.imagenes = null;
     },
+    // Eliminar imagen existente
+    eliminarImagenExistente(index) {
+      this.producto.imagenes.splice(index, 1);
+      this.showNotification("Imagen eliminada correctamente.", "info");
+    },
+    // Eliminar imagen nueva
+    eliminarImagenNueva(index) {
+      this.nuevasImagenes.splice(index, 1);
+      this.showNotification("Imagen eliminada correctamente.", "info");
+    },
+    // Validar campos del formulario
     validarCampos() {
-      const camposObligatorios = [
-        "titulo",
-        "categoria",
-        "extracto",
-        "str_variedad",
-      ];
-      const faltantes = camposObligatorios.filter(
-        (campo) => !this.producto[campo]
-      );
-      if (faltantes.length) {
-        this.$notify({
-          group: "foo",
-          title: "Error",
-          text: `Por favor complete los campos: ${faltantes.join(", ")}.`,
-          type: "error",
-        });
-        return;
+      const {
+        titulo,
+        categoria,
+        subcategoria,
+        precio,
+        stock,
+        extracto,
+        descuento,
+      } = this.producto;
+
+      this.validationErrors = {
+        titulo: !titulo ? "El título es obligatorio." : null,
+        categoria: !categoria ? "La categoría es obligatoria." : null,
+        subcategoria: !subcategoria
+          ? "Debe seleccionar una subcategoría."
+          : null,
+        precio: !precio || precio <= 0 ? "El precio debe ser positivo." : null,
+        stock:
+          stock === null || stock < 0
+            ? "El stock debe ser mayor o igual a 0."
+            : null,
+        extracto: !extracto ? "La descripción es obligatoria." : null,
+        imagenes:
+          this.nuevasImagenes.length + this.producto.imagenes.length === 0
+            ? "Debe cargar al menos una imagen."
+            : null,
+        descuento:
+          descuento < 0 || descuento > 100
+            ? "El descuento debe estar entre 0 y 100%."
+            : null,
+      };
+
+      if (Object.values(this.validationErrors).some((error) => error)) {
+        this.showNotification(
+          "Por favor, corrija los errores antes de continuar.",
+          "warning"
+        );
+        return false;
       }
+
       this.actualizarProducto();
     },
     async actualizarProducto() {
       try {
         const formData = new FormData();
-        Object.entries(this.producto).forEach(([key, value]) =>
-          formData.append(key, value)
-        );
-        if (this.portada) formData.append("portada", this.portada);
 
-        await axios.put(
-          `${this.apiUrl}/editar_producto_admin/${this.$route.params.id}`,
+        // Agregar datos básicos del producto
+        Object.entries(this.producto).forEach(([key, value]) => {
+          if (key !== "imagenes") {
+            formData.append(key, value);
+          }
+        });
+
+        // Agregar imágenes existentes (como JSON para identificar cuáles mantener)
+        if (this.producto.imagenes && this.producto.imagenes.length > 0) {
+          formData.append(
+            "imagenes_actuales",
+            JSON.stringify(this.producto.imagenes)
+          );
+        }
+
+        // Agregar nuevas imágenes (archivos)
+        this.nuevasImagenes.forEach((image) => {
+          formData.append("imagenes", image.file); // Agregar las imágenes nuevas al FormData
+        });
+
+        // Enviar solicitud al servidor
+        const response = await axios.put(
+          `${this.$url}/actualizar_producto_admin/${this.$route.params.id}`,
           formData,
           {
             headers: {
@@ -324,139 +548,244 @@ export default {
           }
         );
 
-        this.$notify({
-          group: "foo",
-          title: "Éxito",
-          text: "Producto actualizado correctamente.",
-          type: "success",
-        });
-        this.$router.push({ name: "producto-index" });
-      } catch (error) {
-        console.error("Error al actualizar el producto:", error);
-        this.$notify({
-          group: "foo",
-          title: "Error",
-          text: "Error al actualizar el producto.",
-          type: "error",
-        });
-      }
-    },
-    async init_variedades() {
-      try {
-        const response = await axios.get(
-          `${this.apiUrl}/obtener_variedad_producto/${this.$route.params.id}`,
-          {
-            headers: { Authorization: `Bearer ${this.$store.state.token}` },
-          }
-        );
-        this.variedades = response.data.variedades;
-      } catch (error) {
-        console.error("Error al cargar variedades:", error);
-      }
-    },
-    async agregar_variedad() {
-      if (!this.variedad.proveedor || !this.variedad.variedad) {
-        this.$notify({
-          group: "foo",
-          title: "Error",
-          text: "Complete los campos de variedad y proveedor.",
-          type: "error",
-        });
-        return;
-      }
+        // Manejo de respuesta exitosa
+        this.showNotification("Producto actualizado correctamente.", "success");
 
-      try {
-        const response = await axios.post(
-          `${this.apiUrl}/registro_variedad_producto`,
-          { ...this.variedad, producto: this.$route.params.id },
-          { headers: { Authorization: `Bearer ${this.$store.state.token}` } }
-        );
-        this.variedades.push(response.data);
-        this.variedad = { proveedor: "", variedad: "", stock: 0 };
-        this.$notify({
-          group: "foo",
-          title: "Éxito",
-          text: "Variedad agregada correctamente.",
-          type: "success",
-        });
+        // Actualizar las imágenes locales después de la respuesta
+        this.producto.imagenes = response.data.data.imagenes;
+        this.nuevasImagenes = []; // Limpiar las nuevas imágenes
+
+        // Redirigir a la lista de productos
+        setTimeout(() => this.$router.push({ name: "producto-index" }), 1000);
       } catch (error) {
-        console.error("Error al agregar variedad:", error);
-        this.$notify({
-          group: "foo",
-          title: "Error",
-          text: "Error al agregar la variedad.",
-          type: "error",
-        });
+        // Verificar si hay un mensaje de error del servidor
+        const errorMessage =
+          error.response && error.response.data && error.response.data.message
+            ? error.response.data.message
+            : "Error al editar el producto. Intente nuevamente.";
+
+        // Mostrar el mensaje del servidor como notificación
+        this.showNotification(errorMessage, "error");
       }
     },
   },
-  beforeMount() {
+  computed: {
+    // Espacios restantes para imágenes
+    espaciosRestantes() {
+      return (
+        this.maxImages -
+        this.producto.imagenes.length -
+        this.nuevasImagenes.length
+      );
+    },
+  },
+  mounted() {
     this.init_data();
   },
 };
 </script>
 
+
 <style scoped>
+/* General card styles */
+.card {
+  border-radius: 15px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+}
+
+.header-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
 
 .header-pretitle {
   font-size: 14px;
   color: #6c757d;
 }
 
-.header-title {
-  font-size: 24px;
-  font-weight: bold;
+.form-label {
+  font-weight: 600;
+  font-size: 16px;
+  color: #343a40;
+  margin-bottom: 8px;
 }
 
-.card {
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.form-control {
-  border: 1px solid #d1d3e2;
+.input-custom {
+  border: 2px solid #ddd;
   border-radius: 8px;
-  padding: 10px 15px;
-  transition: box-shadow 0.3s ease-in-out;
+  padding: 12px;
+  font-size: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.form-control:focus {
-  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+.input-custom:focus {
   border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
 }
 
-.btn-hover {
-  transition: all 0.3s ease-in-out;
+/* Gallery styles */
+.gallery-container {
+  border: 2px solid #007bff;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: #f8f9fa;
 }
 
-.btn-hover:hover {
+.gallery-title {
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.image-placeholder {
+  width: 120px;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  background-color: #ffffff;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.image-placeholder:hover {
+  background-color: #eaf4ff;
   transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.5);
 }
 
-.avatar-img {
-  width: 100px;
+.img-thumbnail {
+  width: 100%;
   height: 100px;
   object-fit: cover;
+  border-radius: 8px;
 }
 
+.image-placeholder .btn {
+  font-size: 12px;
+  margin-top: 10px;
+  padding: 5px 10px;
+}
+
+/* Textarea styles */
 textarea {
   resize: none;
 }
 
-.form-check-input:checked {
-  background-color: #4caf50;
-  border-color: #4caf50;
+/* Button styles */
+.btn {
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 8px 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
 }
 
 .btn-primary {
   background-color: #007bff;
   border-color: #007bff;
-  transition: all 0.3s ease-in-out;
 }
 
 .btn-primary:hover {
   background-color: #0056b3;
   border-color: #0056b3;
+}
+
+.btn-group .btn {
+  margin-right: 8px;
+}
+
+.invalid-feedback {
+  font-size: 14px;
+  color: #dc3545;
+  margin-top: 4px;
+}
+
+/* Navbar styles */
+.nav-link {
+  font-size: 16px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #007bff;
+  background-color: transparent;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: white !important;
+  background-color: #007bff;
+}
+
+.active-link {
+  color: white !important;
+  background-color: #007bff !important;
+  font-weight: 600;
+}
+
+.nav-link.active {
+  color: white !important;
+  background-color: #007bff !important;
+  font-weight: 600;
+}
+
+.nav-tabs {
+  display: flex;
+  justify-content: center;
+}
+
+/* Muted text */
+.text-muted {
+  font-size: 14px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card-img-top {
+    height: 120px;
+  }
+
+  .card {
+    margin: 0 auto 10px;
+  }
+
+  .gallery-container {
+    padding: 15px;
+  }
+
+  .gallery-title {
+    font-size: 18px;
+  }
 }
 </style>

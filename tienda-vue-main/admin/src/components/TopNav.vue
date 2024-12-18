@@ -1,12 +1,9 @@
 <template>
-  <nav class="navbar navbar-expand-md navbar-dark shadow-sm" id="navbar">
+  <nav class="navbar navbar-expand-md navbar-light shadow-sm" id="navbar">
     <div class="container-fluid">
-      <!-- Logo -->
       <a class="navbar-brand d-flex align-items-center" href="#">
         <span>Admin Panel</span>
       </a>
-
-      <!-- Toggle button for mobile -->
       <button
         class="navbar-toggler"
         type="button"
@@ -18,15 +15,10 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-
-      <!-- Right: User Menu -->
       <div class="navbar-user ms-auto d-flex align-items-center">
-        <!-- User Name -->
-        <span class="user-name me-3 text-light d-none d-md-block">
+        <span class="user-name me-3 d-none d-md-block">
           {{ userName }}
         </span>
-
-        <!-- User Dropdown -->
         <div class="dropdown">
           <a
             href="#"
@@ -36,15 +28,26 @@
             aria-expanded="false"
           >
             <img
-              src="/assets/icons/user.png"
+              :src="formatImageUrl(userPhoto)"
+              alt="User Avatar"
               class="avatar-img rounded-circle"
             />
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
+            <li>
+              <a class="dropdown-item" href="#" @click.prevent="goToProfile">
+                Mi Perfil
+              </a>
+            </li>
             <li><hr class="dropdown-divider" /></li>
             <li>
-              <a class="dropdown-item text-danger" href="#">Cerrar Sesion</a>
+              <a
+                class="dropdown-item text-danger"
+                href="#"
+                @click.prevent="logout"
+              >
+                Cerrar Sesión
+              </a>
             </li>
           </ul>
         </div>
@@ -58,8 +61,46 @@ export default {
   name: "TopNav",
   data() {
     return {
-      userName: "Administrador", // Nombre del usuario (puedes obtenerlo dinámicamente desde tu sistema)
+      userName: "",
+      userPhoto: "",
     };
+  },
+  methods: {
+    goToProfile() {
+      this.$router.push({ name: "perfil" });
+    },
+    logout() {
+      localStorage.clear(); // Limpia el almacenamiento local
+      if (this.$store) {
+        this.$store.commit("resetUserState"); // Si usas Vuex, resetea el estado
+      }
+      this.$router.push({ name: "login" }); // Redirige al login
+    },
+    formatImageUrl(imagePath) {
+      if (!imagePath) {
+        return "/assets/icons/user.png";
+      }
+
+
+      let fullUrl = `${this.$url}${imagePath}`;
+
+      fullUrl = fullUrl.includes("/api")
+        ? fullUrl.replace("/api", "")
+        : fullUrl;
+
+
+      return fullUrl;
+    },
+    fetchUserData() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user) {
+        this.userName = `${user.nombre} ${user.apellido}`;
+        this.userPhoto = user.imagen;
+      }
+    },
+  },
+  mounted() {
+    this.fetchUserData();
   },
 };
 </script>
@@ -67,32 +108,32 @@ export default {
 <style scoped>
 /* General Navbar Styles */
 .navbar {
-  background-color: #343a40; /* Negro pastel */
+  background-color: #f8f9fa; /* Gris claro */
   padding: 15px 20px;
-  border-bottom: 1px solid #212529; /* Línea sutil más oscura */
+  border-bottom: 1px solid #ced4da; /* Línea de separación */
 }
 
+/* Navbar Brand */
 .navbar-brand {
   font-size: 20px;
   font-weight: 600;
-  color: #ffffff;
+  color: #495057; /* Gris oscuro */
 }
 
-.navbar-brand .logo {
-  width: 30px;
-  height: 30px;
+.navbar-brand:hover {
+  color: #0056b3; /* Azul más oscuro */
 }
 
 /* User Name */
 .user-name {
   font-size: 16px;
   font-weight: 500;
-  color: #ffffff;
+  color: #495057; /* Gris oscuro */
   transition: color 0.3s ease;
 }
 
 .user-name:hover {
-  color: #00b4d8;
+  color: #343a40; /* Más oscuro */
 }
 
 /* Avatar Styles */
@@ -106,7 +147,7 @@ export default {
   width: 100%;
   height: auto;
   object-fit: cover;
-  border: 2px solid #ffffff; /* Border around the avatar */
+  border: 2px solid #ced4da; /* Borde sutil */
 }
 
 /* User Menu */
@@ -116,7 +157,7 @@ export default {
 }
 
 .dropdown-item:hover {
-  background-color: #495057; /* Hover más claro */
+  background-color: #e9ecef; /* Hover más claro */
 }
 
 .dropdown-divider {
@@ -125,10 +166,10 @@ export default {
 
 /* Navbar toggler */
 .navbar-toggler {
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(0, 0, 0, 0.1);
 }
 
 .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23ffffff' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%280,0,0,0.25%29' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23333' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%280,0,0,0.5%29' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }
 </style>

@@ -7,47 +7,81 @@ import VuePaginate from 'vue-paginate';
 import { BootstrapVue, IconsPlugin, ModalPlugin } from 'bootstrap-vue';
 import axios from 'axios';
 import 'vue-search-select/dist/VueSearchSelect.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
 
-// Configuración global
+import './styles.css';
+
 Vue.config.productionTip = false;
-Vue.prototype.$url = 'http://localhost:4201/api'; // Base URL para las solicitudes API
-Vue.prototype.$token = localStorage.getItem('token'); // Token inicial
+Vue.prototype.$url = 'http://localhost:4201/api';
+Vue.prototype.$token = localStorage.getItem('token');
 
-// Configuración de Axios: Interceptor para manejar tokens expirados
-axios.interceptors.response.use(
-  response => {
-    // Si la respuesta es exitosa, simplemente devuélvela
-    return response;
-  },
-  async error => {
-    if (error.response && error.response.status === 401) {
-      console.warn('Token expirado. Intentando renovar...');
-      try {
-        const response = await axios.post(`${Vue.prototype.$url}/renovar_token`, {}, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}` // Token actual para renovar
-          }
-        });
+let isRefreshing = false; // Variable para evitar múltiples solicitudes de renovación
+let failedRequestsQueue = []; // Cola para reintentar solicitudes
 
-        // Guardar el nuevo token en localStorage y actualizar Vue.prototype
-        const newToken = response.data.token;
-        localStorage.setItem('token', newToken);
-        Vue.prototype.$token = newToken;
-
-        console.log('Token renovado:', newToken);
-
-        // Reintentar la solicitud original con el nuevo token
-        error.config.headers['Authorization'] = `Bearer ${newToken}`;
-        return axios(error.config);
-
-      } catch (tokenError) {
-        console.error('Error al renovar el token:', tokenError);
-        // Redirigir al login si no se pudo renovar
-        router.push({ name: 'login' });
-        return Promise.reject(tokenError);
-      }
+// Configuración de Axios
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Interceptor de respuestas
+axios.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      // Token expirado, intentamos renovarlo
+      if (!isRefreshing) {
+        isRefreshing = true;
+        originalRequest._retry = true;
+
+        try {
+          const response = await axios.post(`${Vue.prototype.$url}/renovar_token`, {}, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+
+          const newToken = response.data.token;
+          console.log('Token renovado exitosamente:', newToken);
+
+          // Guardar el nuevo token
+          localStorage.setItem('token', newToken);
+          Vue.prototype.$token = newToken;
+
+          // Reintentar todas las solicitudes fallidas
+          failedRequestsQueue.forEach((cb) => cb(newToken));
+          failedRequestsQueue = [];
+
+          // Continuar con la solicitud original
+          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+          return axios(originalRequest);
+        } catch (err) {
+          console.error('Error al renovar el token:', err);
+          failedRequestsQueue = [];
+          localStorage.removeItem('token');
+          router.push({ name: 'home' }); // Redirigir al login
+          return Promise.reject(err);
+        } finally {
+          isRefreshing = false;
+        }
+      }
+
+      // Agregar la solicitud actual a la cola mientras se renueva el token
+      return new Promise((resolve) => {
+        failedRequestsQueue.push((newToken) => {
+          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+          resolve(axios(originalRequest));
+        });
+      });
+    }
+
     return Promise.reject(error);
   }
 );
@@ -63,7 +97,5 @@ Vue.use(IconsPlugin);
 new Vue({
   router,
   store,
-  render: function (h) {
-    return h(App);
-  },
+  render: (h) => h(App),
 }).$mount('#app');

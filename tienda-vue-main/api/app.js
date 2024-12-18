@@ -4,8 +4,9 @@ var mongoose = require('mongoose');
 var bodyparser = require('body-parser');
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-const cors = require('cors'); 
+const cors = require('cors');
 const { decodeToken } = require('./middlewares/authenticate');
+const path = require("path");
 
 // Importar las rutas del backend
 var cliente_router = require('./routes/cliente');
@@ -13,8 +14,8 @@ var usuario_router = require('./routes/usuario');
 var producto_router = require('./routes/producto');
 var customer_router = require('./routes/customer');
 var venta_router = require('./routes/venta');
-var public_router = require('./routes/public');
-var categoria_router = require('./routes/categoria'); 
+var ecommerce_router = require('./routes/ecommerce');
+var categoria_router = require('./routes/categoria');
 
 // Configuración de la aplicación
 var app = express();
@@ -44,9 +45,16 @@ app.use(bodyparser.json({ limit: '50mb', extended: true }));
 
 // Configuración de CORS
 app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Authorization', 'X-API-KEY', 'Origin', 'X-Requested-With', 'Content-Type']
+    origin: '*', // Permitir todas las fuentes (puedes restringirlo según sea necesario)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Métodos permitidos
+    allowedHeaders: [
+        'Authorization',
+        'X-API-KEY',
+        'Origin',
+        'X-Requested-With',
+        'Content-Type',
+        'Accept'
+    ],
 }));
 
 // Conexión a MongoDB
@@ -58,11 +66,16 @@ mongoose.connect('mongodb://127.0.0.1:27017/tienda')
         console.error('Error al conectar a la base de datos:', err);
     });
 
+app.use("/assets", express.static(path.join(__dirname, "assets")));
+
 // Servir archivos estáticos
+app.use('/uploads/productos', express.static('uploads/productos'));
+app.use('/uploads/usuarios', express.static('uploads/usuarios'));
+app.use('/uploads/facturas', express.static('uploads/facturas'));
+app.use('/uploads/galeria', express.static('uploads/galeria'));
 app.use('/assets', express.static('public/assets'));
 
-// Rutas públicas (si las tienes)
-app.use('/api', public_router);
+
 
 // Rutas protegidas (requieren autenticación)
 app.use('/api', cliente_router);
@@ -70,7 +83,8 @@ app.use('/api', usuario_router);
 app.use('/api', producto_router);
 app.use('/api', customer_router);
 app.use('/api', venta_router);
-app.use('/api', categoria_router); 
+app.use('/api', categoria_router);
+app.use('/api', ecommerce_router);
 
 // Levantar el servidor
 httpServer.listen(port, () => {

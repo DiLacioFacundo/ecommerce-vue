@@ -1,11 +1,10 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var Venta_detalleSchema = Schema({
+var Venta_DetalleSchema = Schema({
     year : {type: Number, required: true},
     month : {type: Number, required: true},
     day : {type: Number, required: true},
-    proveedor : {type: String, required: true},
     subtotal : {type: Number, required: true},
     precio_unidad : {type: Number, required: true},
     cantidad : {type: Number, required: true},
@@ -15,4 +14,4 @@ var Venta_detalleSchema = Schema({
     variedad : {type: Schema.ObjectId, ref: 'variedad', required: true},
     createdAt: {type: Date, default: Date.now}
 });
-module.exports = mongoose.model('venta_Detalle',Venta_detalleSchema);
+module.exports = mongoose.model('venta_detalle',Venta_DetalleSchema);

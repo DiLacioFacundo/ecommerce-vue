@@ -11,7 +11,7 @@
       ></notificacion>
       <div class="container-fluid">
         <div class="row justify-content-center">
-          <div class="col-12 col-lg-10 col-xl-8">
+          <div class="col-12 col-lg-10 col-xl-8" style="width: 100%">
             <!-- Header -->
             <div class="header mt-md-3">
               <div class="header-body text-center">
@@ -20,7 +20,7 @@
                     <h6 class="header-pretitle">Categorías</h6>
                     <h1 class="header-title">
                       <i class="fas fa-folder-open me-2 text-primary"></i>
-                      Gestion de Categorías
+                      Gestión de Categorías
                     </h1>
                   </div>
                 </div>
@@ -66,6 +66,35 @@
                   <i class="fas fa-list-alt text-primary me-2"></i>
                   Listado de Categorías
                 </h5>
+
+                <!-- Buscador y Dropdown -->
+                <div class="input-group mb-4 buscador-container">
+                  <span
+                    class="input-group-text bg-primary text-white buscador-icon"
+                  >
+                    <i class="fas fa-search"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control buscador-input"
+                    v-model="busqueda"
+                    placeholder="Buscar categorías..."
+                  />
+                  <select
+                    v-model="filtroCategoria"
+                    class="form-select buscador-dropdown"
+                  >
+                    <option value="">Todas las categorías</option>
+                    <option
+                      v-for="categoria in categorias"
+                      :key="categoria.categoria?._id"
+                      :value="categoria.categoria?._id"
+                    >
+                      {{ categoria.categoria?.titulo || "" }}
+                    </option>
+                  </select>
+                </div>
+                <!-- Tabla -->
                 <div class="table-responsive">
                   <table class="table table-hover text-center align-middle">
                     <thead class="table-primary">
@@ -77,6 +106,7 @@
                       </tr>
                     </thead>
                     <tbody>
+                      <!-- Mostrar mensaje de carga -->
                       <tr v-if="cargando">
                         <td colspan="4">
                           <div
@@ -87,12 +117,27 @@
                           </div>
                         </td>
                       </tr>
+
+                      <!-- Mostrar mensaje de "No se encontraron categorías" -->
+                      <tr v-else-if="categoriasFiltradas.length === 0">
+                        <td colspan="4" class="text-center py-5">
+                          <h6 class="text-uppercase text-muted">
+                            No se encontraron categorías
+                          </h6>
+                        </td>
+                      </tr>
+
+                      <!-- Mostrar categorías si están disponibles -->
                       <template v-else>
                         <tr
-                          v-for="(categoria, index) in categorias"
+                          v-for="(
+                            categoria, index
+                          ) in categoriasFiltradasPaginadas"
                           :key="categoria.categoria?._id || index"
                         >
-                          <td>{{ index + 1 }}</td>
+                          <td>
+                            {{ (currentPage - 1) * perPage + index + 1 }}
+                          </td>
                           <td>
                             <input
                               v-if="categoria.editing"
@@ -104,18 +149,18 @@
                             }}</span>
                           </td>
                           <td>
-                            <!-- Buscador para subcategorías -->
-                            <div class="mb-2">
-                              <input
-                                type="text"
-                                class="form-control form-control-sm"
-                                v-model="categoria.searchQuery"
-                                placeholder="Buscar subcategorías..."
-                              />
-                            </div>
-
                             <!-- Subcategorías en lista -->
                             <div class="subcategory-container">
+                              <!-- Buscador de subcategorías -->
+                              <div class="input-group mb-2">
+                                <input
+                                  type="text"
+                                  class="form-control form-control-sm"
+                                  v-model="categoria.searchQuery"
+                                  placeholder="Buscar subcategorías..."
+                                />
+                              </div>
+                              <!-- Lista de subcategorías filtradas -->
                               <ul class="subcategory-list">
                                 <li
                                   v-for="subcategoria in filtrarSubcategorias(
@@ -191,16 +236,14 @@
                                   )
                                 "
                               >
-                                <i class="fas fa-floppy-disk me-1"></i>
-                                Guardar
+                                <i class="fas fa-floppy-disk me-1"></i> Guardar
                               </button>
                               <button
                                 class="btn btn-outline-secondary btn-sm d-flex align-items-center"
                                 v-else
                                 @click="habilitarEdicion(categoria)"
                               >
-                                <i class="fas fa-edit me-1"></i>
-                                Editar
+                                <i class="fas fa-edit me-1"></i> Editar
                               </button>
                               <button
                                 class="btn btn-outline-danger btn-sm d-flex align-items-center"
@@ -208,8 +251,7 @@
                                   eliminarCategoria(categoria.categoria._id)
                                 "
                               >
-                                <i class="fas fa-trash me-1"></i>
-                                Eliminar
+                                <i class="fas fa-trash me-1"></i> Eliminar
                               </button>
                             </div>
                           </td>
@@ -224,6 +266,29 @@
                     No hay categorías disponibles.
                   </p>
                 </div>
+                <div class="card-footer text-center">
+                  <div
+                    class="d-flex justify-content-center align-items-center gap-3"
+                  >
+                    <select
+                      v-model="perPage"
+                      class="form-select custom-dropdown w-auto paginator-dropdown"
+                    >
+                      <option :value="5">5 registros por pagina</option>
+                      <option :value="10">10 registros por pagina</option>
+                      <option :value="20">20 registros por pagina</option>
+                    </select>
+                    <div class="paginator-container">
+                      <b-pagination
+                        v-model="currentPage"
+                        :total-rows="categoriasFiltradas.length"
+                        :per-page="perPage"
+                        align="center"
+                        aria-controls="my-table"
+                      ></b-pagination>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -232,6 +297,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import Sidebar from "@/components/Sidebar.vue";
@@ -254,14 +320,51 @@ export default {
       mostrarModalSubcategoria: false,
       categoriaSeleccionada: null,
       nuevaSubcategoriaTitulo: "",
-      // Modal control
+      busqueda: "",
+      filtroCategoria: "",
+      perPage: 5,
+      currentPage: 1,
       modalSubcategoriaVisible: false,
       notificationVisible: false,
       notificationMessage: "",
       notificationType: "info",
     };
   },
+  computed: {
+    categoriasFiltradas() {
+      let categoriasFiltradas = this.categorias;
+
+      // Filtro por categoría específica
+      if (this.filtroCategoria) {
+        categoriasFiltradas = categoriasFiltradas.filter(
+          (categoria) => categoria.categoria?._id === this.filtroCategoria
+        );
+      }
+
+      // Búsqueda por texto
+      if (this.busqueda.trim()) {
+        categoriasFiltradas = categoriasFiltradas.filter((categoria) =>
+          categoria.categoria?.titulo
+            ?.toLowerCase()
+            .includes(this.busqueda.toLowerCase())
+        );
+      }
+
+      return categoriasFiltradas;
+    },
+    categoriasFiltradasPaginadas() {
+      const inicio = (this.currentPage - 1) * this.perPage;
+      const fin = inicio + this.perPage;
+      return this.categoriasFiltradas.slice(inicio, fin);
+    },
+    totalPaginas() {
+      return Math.ceil(this.categoriasFiltradas.length / this.perPage);
+    },
+  },
   methods: {
+    cambiarPagina(nuevaPagina) {
+      this.currentPage = nuevaPagina;
+    },
     // Método para mostrar notificaciones
     showNotification(message, type) {
       this.notificationMessage = message;
@@ -302,18 +405,21 @@ export default {
         await axios.put(
           `${this.$url}/actualizar_subcategoria_admin/${subcategoria._id}`,
           { titulo: subcategoria.titulo },
-          { headers: { Authorization: `Bearer ${this.$store.state.token}` } }
+          { Authorization: `Bearer ${localStorage.getItem("token")}` }
         );
         this.showNotification("Subcategoría guardada con éxito.", "success");
 
         // Actualiza las categorías después de guardar
         this.cargarCategorias();
       } catch (error) {
-        this.showNotification(
-          error.response?.data?.message ||
-            "Error al guardar la subcategoría. Inténtalo de nuevo.",
-          "error"
-        );
+        // Verificar si hay un mensaje de error del servidor
+        const errorMessage =
+          error.response && error.response.data && error.response.data.message
+            ? error.response.data.message
+            : "Error al guardar la subcategoria. Intente nuevamente.";
+
+        // Mostrar el mensaje del servidor como notificación
+        this.showNotification(errorMessage, "error");
       }
     },
 
@@ -333,10 +439,14 @@ export default {
         );
         this.cargarCategorias();
       } catch (error) {
-        this.showNotification(
-          "Error al eliminar la subcategoría. Inténtalo de nuevo.",
-          "error"
-        );
+        // Verificar si hay un mensaje de error del servidor
+        const errorMessage =
+          error.response && error.response.data && error.response.data.message
+            ? error.response.data.message
+            : "Error al eliminar la subcategoria. Intente nuevamente.";
+
+        // Mostrar el mensaje del servidor como notificación
+        this.showNotification(errorMessage, "error");
       }
     },
     async cargarCategorias() {
@@ -348,13 +458,22 @@ export default {
             headers: { Authorization: `Bearer ${this.$store.state.token}` },
           }
         );
-        this.categorias = response.data.categorias.map((categoria) => ({
-          ...categoria,
-          searchQuery: "",
-          editing: false,
-        }));
+        this.categorias = response.data.categorias
+          .filter((categoria) => categoria.categoria.titulo !== "Sin Categoría")
+          .map((categoria) => ({
+            ...categoria,
+            searchQuery: "",
+            editing: false,
+          }));
       } catch (error) {
-        this.showNotification("Error al cargar categorías.", "error");
+        // Verificar si hay un mensaje de error del servidor
+        const errorMessage =
+          error.response && error.response.data && error.response.data.message
+            ? error.response.data.message
+            : "Error al cargar la categoria. Intente nuevamente.";
+
+        // Mostrar el mensaje del servidor como notificación
+        this.showNotification(errorMessage, "error");
       } finally {
         this.cargando = false;
       }
@@ -395,6 +514,7 @@ export default {
           );
         }
       }
+      this.cargarCategorias();
     },
     // Guardar edición de una categoría
     async guardarEdicion(id, titulo) {
@@ -407,11 +527,14 @@ export default {
         this.cargarCategorias();
         this.showNotification("Categoría guardada con éxito.", "success");
       } catch (error) {
-        this.showNotification(
-          "Error al guardar la categoría. Inténtalo de nuevo.",
-          "error"
-        );
-        console.error("Error al guardar categoría:", error);
+        // Verificar si hay un mensaje de error del servidor
+        const errorMessage =
+          error.response && error.response.data && error.response.data.message
+            ? error.response.data.message
+            : "Error al guardar la categoria. Intente nuevamente.";
+
+        // Mostrar el mensaje del servidor como notificación
+        this.showNotification(errorMessage, "error");
       }
     },
 
@@ -427,11 +550,14 @@ export default {
         this.cargarCategorias();
         this.showNotification("Categoría eliminada correctamente.", "success");
       } catch (error) {
-        this.showNotification(
-          "Error al eliminar la categoría. Inténtalo de nuevo.",
-          "error"
-        );
-        console.error("Error al eliminar categoría:", error);
+        // Verificar si hay un mensaje de error del servidor
+        const errorMessage =
+          error.response && error.response.data && error.response.data.message
+            ? error.response.data.message
+            : "Error al eliminar la categoria. Intente nuevamente.";
+
+        // Mostrar el mensaje del servidor como notificación
+        this.showNotification(errorMessage, "error");
       }
     },
     // Habilitar edición para una categoría
@@ -455,8 +581,9 @@ export default {
 };
 </script>
 
-<style scoped>
 
+
+<style scoped>
 .header-pretitle {
   font-size: 14px;
   color: #6c757d;
@@ -472,6 +599,31 @@ export default {
   font-weight: 500;
   color: #333;
 }
+
+/* Dropdown Styles */
+.custom-dropdown {
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.custom-dropdown:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.5);
+}
+
+.custom-dropdown:hover {
+  background-color: #f9f9f9;
+}
+
+.custom-dropdown option {
+  padding: 10px;
+  font-size: 16px;
+}
+
 .table {
   border-collapse: separate;
   border-spacing: 0;
@@ -492,6 +644,8 @@ export default {
   border: 1px solid #007bff;
   text-align: center;
   vertical-align: middle;
+  font-size: 15px;
+  padding: 10px 15px;
 }
 
 /* Subcategorías */
@@ -573,5 +727,19 @@ export default {
   padding: 0.375rem 0.75rem;
   font-size: 0.875rem;
   border-radius: 0.25rem;
+}
+
+.paginator-dropdown {
+  min-width: 200px;
+}
+
+.paginator-container {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.paginator-container .pagination {
+  margin: 0;
 }
 </style>

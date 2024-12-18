@@ -12,10 +12,16 @@
       <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8 col-xl-6">
           <h1 class="text-center mb-4">Iniciar Sesión</h1>
-          <p class="text-muted text-center mb-4">Accede al Panel Administrador</p>
+          <p class="text-muted text-center mb-4">
+            Accede al Panel Administrador
+          </p>
 
           <form @submit.prevent="validar">
-            <div v-if="msm_error" class="alert alert-danger text-center" role="alert">
+            <div
+              v-if="msm_error"
+              class="alert alert-danger text-center"
+              role="alert"
+            >
               {{ msm_error }}
             </div>
 
@@ -43,8 +49,13 @@
                   placeholder="Ingresa tu contraseña"
                   :class="{ 'is-invalid': !password && formSubmitted }"
                 />
-                <span class="input-group-text password-toggle" @click="togglePasswordVisibility">
-                  <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                <span
+                  class="input-group-text password-toggle"
+                  @click="togglePasswordVisibility"
+                >
+                  <i
+                    :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
+                  ></i>
                 </span>
                 <div v-if="!password && formSubmitted" class="invalid-feedback">
                   Por favor, ingresa una contraseña.
@@ -96,24 +107,30 @@ export default {
       this.msm_error = "";
       this.login();
     },
+
     login() {
       this.isLoading = true;
       const data = { email: this.email, password: this.password };
+
       axios
         .post(`${this.$url}/login_usuario`, data, {
           headers: { "Content-Type": "application/json" },
         })
-        .then((result) => {
-          if (!result.data.token) {
-            this.msm_error = result.data.message || "Credenciales inválidas.";
-          } else {
-            this.$store.dispatch("saveToken", result.data.token);
+        .then((response) => {
+          if (response.data.token) {
+            // Guardar token y datos del usuario en el local storage
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("user", JSON.stringify(response.data.usuario));
+
+            // Redirigir al dashboard
             this.$router.push({ name: "dashboard" });
+          } else {
+            this.msm_error = response.data.message || "Error desconocido.";
           }
         })
         .catch((error) => {
-          console.error(error);
-          this.msm_error = "Error de conexión, por favor intenta nuevamente.";
+          console.error("Error en el login:", error);
+          this.msm_error = "Error en el inicio de sesión. Intenta nuevamente.";
         })
         .finally(() => {
           this.isLoading = false;

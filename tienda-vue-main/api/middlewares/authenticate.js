@@ -1,33 +1,42 @@
 const jwt = require('jsonwebtoken');
-const secret = 'diego'; 
+const secret = process.env.JWT_SECRET || 'diego';
+
 function decodeToken(req, res, next) {
     const authHeader = req.headers['authorization'];
 
     if (!authHeader) {
-        console.error('No se proporcionó el encabezado de autorización');
-        return res.status(401).json({ message: 'No se proporcionó un token de autorización' });
+        return res.status(401).json({
+            success: false,
+            message: 'No se proporcionó el token de autorización.',
+        });
     }
 
-    const token = authHeader.split(' ')[1];
+    const [scheme, token] = authHeader.split(' ');
 
-    if (!token) {
-        return res.status(401).json({ message: 'Token no válido' });
+    if (!token || scheme !== 'Bearer') {
+        return res.status(401).json({
+            success: false,
+            message: 'El formato del token es incorrecto. Use "Bearer <token>".',
+        });
     }
 
     jwt.verify(token, secret, (err, decoded) => {
         if (err) {
-            if (err.name === 'TokenExpiredError') {
-                return res.status(401).json({ message: 'Token expirado' });
-            } else if (err.name === 'JsonWebTokenError') {
-                return res.status(401).json({ message: 'Token inválido' });
-            } else {
-                return res.status(500).json({ message: 'Error al verificar el token' });
-            }
+            const errorMessages = {
+                TokenExpiredError: 'El token ha expirado.',
+                JsonWebTokenError: 'El token es inválido.',
+                NotBeforeError: 'El token aún no es válido.',
+            };
+            return res.status(401).json({
+                success: false,
+                message: errorMessages[err.name] || 'Error al verificar el token.',
+            });
         }
-        req.user = decoded;
-        next();
+
+        // El token es válido
+        req.user = decoded; // Decodifica el token y lo guarda en `req.user`
+        next(); // Continúa con el siguiente middleware o controlador
     });
 }
-
 
 module.exports = { decodeToken };

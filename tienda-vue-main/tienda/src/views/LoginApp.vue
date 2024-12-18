@@ -4,7 +4,6 @@
     <section
       class="hero text-center text-white d-flex align-items-center justify-content-center"
       style="
-        background-image: url('/as/icons/background-vape.png');
         background-size: cover;
         background-position: center;
         height: 400px;
