@@ -1,6 +1,6 @@
-const express = require('express');
-const ecommerceController = require('../controllers/ecommerceController');
-const router = express.Router();
+var express = require('express');
+var ecommerceController = require('../controllers/ecommerceController');
+var router = express.Router();
 
 // Rutas públicas para productos
 router.get('/productos/nuevos', ecommerceController.obtener_nuevos_productos); // Últimos 4 productos

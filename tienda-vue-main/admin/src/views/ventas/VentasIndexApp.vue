@@ -157,7 +157,7 @@
                     </thead>
                     <tbody>
                       <!-- Ventas disponibles -->
-                      <template v-if="filteredSales.length > 0">
+                      <template v-if="filtered.length > 0">
                         <tr
                           v-for="(sale, index) in paginatedSales"
                           :key="sale._id"
@@ -245,7 +245,7 @@
                     <div class="paginator-container">
                       <b-pagination
                         v-model="currentPage"
-                        :total-rows="filteredSales.length"
+                        :total-rows="filtered.length"
                         :per-page="perPage"
                         align="center"
                         aria-controls="sales-table"
@@ -344,8 +344,8 @@ import axios from "axios";
 export default {
   data() {
     return {
-      allSales: [], // Lista de ventas
-      filteredSales: [], // Ventas filtradas según los filtros
+      sales: [], // Lista de ventas
+      filtered: [], // Ventas filtradas según los filtros
       selectedSale: null, // Venta seleccionada
       selectedSaleDetails: [], // Detalles de la venta seleccionada
       currentPage: 1,
@@ -372,8 +372,11 @@ export default {
     Notificacion,
   },
   computed: {
-    // Ventas filtradas y ordenadas según los criterios
     filteredSales() {
+      // Validamos que `sales` sea un array
+      if (!Array.isArray(this.sales)) return [];
+
+      // Filtrar las ventas según búsqueda, estado y rango de fechas
       let filtered = this.sales;
 
       // Filtro por búsqueda
@@ -381,9 +384,9 @@ export default {
         const query = this.searchQuery.toLowerCase();
         filtered = filtered.filter(
           (sale) =>
-            sale.cliente.nombres.toLowerCase().includes(query) ||
-            sale.cliente.email.toLowerCase().includes(query) ||
-            sale.transaccion.toLowerCase().includes(query)
+            sale.cliente?.nombres.toLowerCase().includes(query) ||
+            sale.cliente?.email.toLowerCase().includes(query) ||
+            sale.transaccion?.toLowerCase().includes(query)
         );
       }
 
@@ -418,7 +421,7 @@ export default {
       }
 
       // Ordenar las ventas por el criterio seleccionado
-      filtered = filtered.sort((a, b) => {
+      return filtered.sort((a, b) => {
         const valueA = this.getValueForSorting(a, this.sortBy);
         const valueB = this.getValueForSorting(b, this.sortBy);
 
@@ -428,19 +431,16 @@ export default {
           return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
         }
       });
-
-      return filtered;
+    },
+    paginatedSales() {
+      const start = (this.currentPage - 1) * this.perPage;
+      const end = start + this.perPage;
+      return this.filteredSales.slice(start, end);
     },
     paginatedDetails() {
       const start = (this.currentDetailsPage - 1) * this.detailsPerPage;
       const end = start + this.detailsPerPage;
       return this.selectedSaleDetails.slice(start, end);
-    },
-    // Paginación de las ventas filtradas
-    paginatedSales() {
-      const start = (this.currentPage - 1) * this.perPage;
-      const end = start + this.perPage;
-      return this.filteredSales.slice(start, end);
     },
   },
   watch: {
@@ -450,98 +450,39 @@ export default {
   },
   methods: {
     sortByDate() {
-      this.filteredSales = this.filteredSales.sort((a, b) => {
+      // Aplica lógica de ordenamiento por fecha
+      this.filtered = this.filtered.sort((a, b) => {
         const dateA = new Date(a.createdAt);
         const dateB = new Date(b.createdAt);
-
         return this.sortOrder === "asc" ? dateA - dateB : dateB - dateA;
       });
     },
-    // Cambiar el criterio de ordenación
-    sort(criterion) {
-      if (this.sortBy === criterion) {
-        // Si el criterio ya es el mismo, solo cambia el orden
-        this.sortOrder = this.sortOrder === "asc" ? "desc" : "asc";
-      } else {
-        // Si es un nuevo criterio, cambia el criterio y orden ascendente por defecto
-        this.sortBy = criterion;
-        this.sortOrder = "asc";
-      }
-    },
-    // Obtener el valor para ordenamiento
-    getValueForSorting(item, criterion) {
-      return criterion.includes(".")
-        ? criterion.split(".").reduce((obj, key) => obj?.[key], item)
-        : item[criterion];
-    },
-    async confirmCancelSale(id) {
-      const confirmation = confirm(
-        "¿Estás seguro de que deseas cancelar esta venta?"
-      );
-      if (confirmation) {
-        this.cancelSale(id);
-      }
-    },
-    async cancelSale(id) {
-      try {
-        // Actualización optimista: Cambia el estado de la venta en el frontend
-        const saleIndex = this.sales.findIndex((sale) => sale._id === id);
-        if (saleIndex !== -1) {
-          this.sales[saleIndex].estado = "Cancelada";
-        }
-
-        // Llamada a la API para cancelar la venta en el backend
-        await axios.put(
-          `${this.$url}/ventas/estado`,
-          { id, estado: "Cancelada" },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-
-        this.showNotification("Venta cancelada correctamente.", "success");
-        this.loadSales(); // Recargar ventas
-      } catch (error) {
-        console.error("Error al cancelar la venta:", error);
-        this.showNotification(
-          "No se pudo cancelar la venta. Intenta nuevamente.",
-          "error"
-        );
-      }
-    },
     async loadSales() {
       this.loading = true;
-      this.notificationVisible = false; // Ocultar cualquier notificación anterior
+      this.notificationVisible = false; // Ocultar notificaciones anteriores
+
       try {
         const response = await axios.get(`${this.$url}/ventas/admin`, {
-          params: {
-            filtro: this.filterByDateRange,
-          },
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
 
-        this.sales = response.data;
-        this.filteredSales = this.sales;
+        this.sales = response.data || [];
+        this.filtered = [...this.sales];
         this.showNotification("Ventas cargadas correctamente.", "success");
       } catch (error) {
         console.error("Error al cargar las ventas:", error);
-        this.showNotification(
-          "Error al cargar las ventas. Intenta nuevamente.",
-          "error"
-        );
+        this.showNotification("Error al cargar las ventas.", "error");
       } finally {
         this.loading = false;
       }
     },
     async viewDetails(sale) {
-      if (this.loading) return; // Evita llamadas simultáneas
+      if (this.loading) return; // Evitar llamadas simultáneas
 
       try {
-        this.loading = true; // Indica que los datos están cargando
+        this.loading = true;
         const response = await axios.get(
           `${this.$url}/ventas/admin/${sale._id}`,
           {
@@ -551,22 +492,16 @@ export default {
           }
         );
 
-        // Asigna los datos directamente
+        // Asignar detalles de la venta
         this.selectedSale = response.data.venta;
-
-        // Procesa los detalles
         this.selectedSaleDetails = response.data.detalles.map((detalle) => {
-          const formattedImage = this.formatImageUrl(detalle.producto.imagen); // Usa la función para formatear la URL
-
           return {
             ...detalle,
-            producto: detalle.producto.titulo, // Asigna el nombre del producto
-            variedad: detalle.variedad ? detalle.variedad.nombre : "", // Asigna el nombre de la variedad
-            imagen: formattedImage, // Agrega la URL formateada de la imagen
+            producto: detalle.producto.titulo || "Producto no disponible",
+            variedad: detalle.variedad?.nombre || "N/A",
+            imagen: this.formatImageUrl(detalle.producto.imagen),
           };
         });
-
-        this.showDetailsModal = true; // Abre el modal
       } catch (error) {
         console.error("Error al obtener detalles de la venta:", error);
         this.showNotification(
@@ -578,10 +513,6 @@ export default {
       }
     },
     formatImageUrl(imagePath) {
-      if (!imagePath) {
-        return "/assets/icons/user.png";
-      }
-
       let fullUrl = `${this.$url}${imagePath}`;
 
       fullUrl = fullUrl.includes("/api")
@@ -589,6 +520,26 @@ export default {
         : fullUrl;
 
       return fullUrl;
+    },
+    sort(criterion) {
+      if (this.sortBy === criterion) {
+        this.sortOrder = this.sortOrder === "asc" ? "desc" : "asc";
+      } else {
+        this.sortBy = criterion;
+        this.sortOrder = "asc";
+      }
+    },
+    getValueForSorting(item, criterion) {
+      return criterion.includes(".")
+        ? criterion.split(".").reduce((obj, key) => obj?.[key], item)
+        : item[criterion];
+    },
+    calculateStatistics(sales) {
+      this.totalSales = sales.length;
+      this.totalRevenue = sales.reduce((sum, sale) => sum + sale.total, 0);
+      this.pendingSales = sales.filter(
+        (sale) => sale.estado === "Pendiente"
+      ).length;
     },
     clearFilters() {
       this.searchQuery = "";
@@ -609,25 +560,21 @@ export default {
           return "badge-secondary";
       }
     },
-    calculateStatistics(sales) {
-      this.totalSales = sales.length;
-      this.totalRevenue = sales.reduce((sum, sale) => sum + sale.total, 0);
-      this.pendingSales = sales.filter(
-        (sale) => sale.estado === "Pendiente"
-      ).length;
-    },
     showNotification(message, type) {
       this.notificationMessage = message;
       this.notificationType = type;
       this.notificationVisible = true;
+
       setTimeout(() => {
         this.notificationVisible = false;
       }, 3000);
     },
   },
+  mounted() {
+    this.loadSales();
+  },
 };
 </script>
-
 
 <style scoped>
 .card.shadow-sm.mt-2 {

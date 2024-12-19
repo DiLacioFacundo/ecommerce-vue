@@ -5,7 +5,6 @@ var bodyparser = require('body-parser');
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const cors = require('cors');
-const { decodeToken } = require('./middlewares/authenticate');
 const path = require("path");
 
 // Importar las rutas del backend
@@ -15,6 +14,7 @@ var producto_router = require('./routes/producto');
 var venta_router = require('./routes/venta');
 var ecommerce_router = require('./routes/ecommerce');
 var categoria_router = require('./routes/categoria');
+var dashboard_router = require('./routes/dashboard');
 
 // Configuración de la aplicación
 var app = express();
@@ -83,6 +83,7 @@ app.use('/api', producto_router);
 app.use('/api', venta_router);
 app.use('/api', categoria_router);
 app.use('/api', ecommerce_router);
+app.use('/api', dashboard_router);
 
 // Levantar el servidor
 httpServer.listen(port, () => {

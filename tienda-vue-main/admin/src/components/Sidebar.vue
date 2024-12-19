@@ -3,13 +3,20 @@
     <div class="container-fluid">
       <!-- Brand -->
       <div class="navbar-brand d-flex flex-column align-items-center py-3">
-        <img class="navbar-brand-img" src="/assets/logo.png" alt="Logo" />
+        <router-link to="/dashboard">
+          <img class="navbar-brand-img" src="/assets/logo.png" alt="Logo" />
+        </router-link>
       </div>
 
       <!-- Navigation -->
       <ul class="navbar-nav mt-4">
         <li class="nav-item">
-          <!-- Abrir "E-commerce" en una nueva pestaña -->
+          <router-link to="/dashboard" class="nav-link" active-class="active">
+            <i class="fe fe-globe"></i>
+            <span>Dashboard</span>
+          </router-link>
+        </li>
+        <li class="nav-item">
           <a @click="openEcommerce" class="nav-link">
             <i class="fe fe-globe"></i>
             <span>E-commerce</span>
