@@ -650,8 +650,6 @@ export default {
 
 /* Subcategorías */
 .subcategory-container {
-  max-height: 150px;
-  overflow-y: auto;
   padding: 10px;
   border: 1px solid #dee2e6;
   border-radius: 8px;
@@ -659,6 +657,8 @@ export default {
 }
 
 .subcategory-list {
+    max-height: 150px;
+  overflow-y: auto;
   list-style: none;
   padding: 0;
   margin: 0;
