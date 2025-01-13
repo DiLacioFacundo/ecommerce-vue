@@ -697,9 +697,10 @@ export default {
 
 /* Sección de títulos */
 .gallery-title {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
   margin-bottom: 15px;
+  text-transform: uppercase;
   color: #343a40;
 }
 

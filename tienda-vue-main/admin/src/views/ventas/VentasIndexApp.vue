@@ -90,7 +90,7 @@
               <div class="col-12 col-md-4">
                 <div class="card text-center shadow-sm">
                   <div class="card-body">
-                    <h5 class="text-muted">Total Ventas</h5>
+                    <h5 class="text-uppercase text-muted">Total Ventas</h5>
                     <h2 class="text-primary">{{ totalSales }}</h2>
                   </div>
                 </div>
@@ -98,7 +98,7 @@
               <div class="col-12 col-md-4">
                 <div class="card text-center shadow-sm">
                   <div class="card-body">
-                    <h5 class="text-muted">Ingresos Totales</h5>
+                    <h5 class="text-uppercase text-muted">Ingresos Totales</h5>
                     <h2 class="text-success">$ {{ totalRevenue }}</h2>
                   </div>
                 </div>
@@ -106,7 +106,7 @@
               <div class="col-12 col-md-4">
                 <div class="card text-center shadow-sm">
                   <div class="card-body">
-                    <h5 class="text-muted">Ventas Pendientes</h5>
+                    <h5 class="text-uppercase text-muted">Ventas Pendientes</h5>
                     <h2 class="text-danger">{{ pendingSales }}</h2>
                   </div>
                 </div>
@@ -595,7 +595,9 @@ export default {
 
 /* General Card Styles */
 .card-title {
-  font-size: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 15px;
   font-weight: 500;
   color: #333;
 }

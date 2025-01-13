@@ -36,7 +36,7 @@
           <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm">
               <div class="card-body text-center">
-                <h4 class="text-muted">Total Ventas</h4>
+                <h5 class="text-uppercase text-muted">Total Ventas</h5>
                 <h3 class="text-primary">$ {{ totalSales }}</h3>
               </div>
             </div>
@@ -44,7 +44,7 @@
           <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm">
               <div class="card-body text-center">
-                <h4 class="text-muted">Usuarios Activos</h4>
+                <h5 class="text-uppercase text-muted">Usuarios Activos</h5>
                 <h3 class="text-success">{{ activeUsers }}</h3>
               </div>
             </div>
@@ -52,7 +52,7 @@
           <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm">
               <div class="card-body text-center">
-                <h4 class="text-muted">Pedidos Pendientes</h4>
+                <h5 class="text-uppercase text-muted">Pedidos Pendientes</h5>
                 <h3 class="text-warning">{{ pendingOrders }}</h3>
               </div>
             </div>
@@ -60,7 +60,7 @@
           <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm">
               <div class="card-body text-center">
-                <h4 class="text-muted">Ganancias</h4>
+                <h5 class="text-uppercase text-muted">Ganancias</h5>
                 <h3 class="text-danger">$ {{ earnings }}</h3>
               </div>
             </div>
@@ -72,7 +72,7 @@
           <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm">
               <div class="card-body text-center">
-                <h4 class="text-muted">Pedidos Cancelados</h4>
+                <h5 class="text-uppercase text-muted">Pedidos Cancelados</h5>
                 <h3 class="text-danger">{{ canceledOrders }}</h3>
               </div>
             </div>
@@ -80,7 +80,7 @@
           <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm">
               <div class="card-body text-center">
-                <h4 class="text-muted">Tasa de Retención</h4>
+                <h5 class="text-uppercase text-muted">Tasa de Retención</h5>
                 <h3 class="text-info">{{ customerRetentionRate }}%</h3>
               </div>
             </div>
@@ -135,30 +135,42 @@
             <div class="card shadow-sm">
               <div class="card-body table-responsive">
                 <h5 class="card-title text-center">
-                  <i class="fas fa-star text-warning me-2"></i> Productos Más
-                  Vendidos
+                  <i class="fas fa-star text-warning me-2"></i>
+                  <span class="text-uppercase fw-bold">
+                    Productos Más Vendidos
+                  </span>
                 </h5>
                 <div class="card-body">
                   <div v-if="topSellingProducts.length">
                     <ul class="list-group">
                       <li
-                        v-for="product in topSellingProducts"
+                        v-for="(product, index) in topSellingProducts"
                         :key="product.titulo"
-                        class="list-group-item d-flex align-items-center"
+                        class="list-group-item d-flex align-items-center p-3 mb-2 rounded shadow-sm"
+                        :style="{
+                          background: index % 2 === 0 ? '#f9f9f9' : '#ffffff',
+                        }"
                       >
                         <!-- Imagen del producto -->
                         <img
                           :src="formatImageUrl(product.imagen)"
                           alt="Imagen del Producto"
-                          class="rounded-circle me-3"
-                          style="width: 50px; height: 50px; object-fit: cover"
+                          class="rounded me-3"
+                          style="
+                            width: 80px;
+                            height: 80px;
+                            object-fit: cover;
+                            border: 2px solid #007bff;
+                          "
                         />
                         <!-- Detalles del producto -->
                         <div class="d-flex flex-column flex-grow-1">
-                          <span class="fw-bold">{{ product.titulo }}</span>
-                          <small class="text-muted"
-                            >Ventas: {{ product.totalVentas }}</small
-                          >
+                          <span class="fw-bold text-primary">
+                            {{ index + 1 }}. {{ product.titulo }}
+                          </span>
+                          <small class="text-muted">
+                            Ventas: {{ product.totalVentas }}
+                          </small>
                         </div>
                         <!-- Botón de detalles -->
                         <button
@@ -178,6 +190,7 @@
             </div>
           </div>
         </div>
+
         <!-- Detalles del Producto -->
         <div v-if="selectedProduct" class="row g-4 mt-4 justify-content-center">
           <div class="col-md-12">
@@ -267,7 +280,7 @@ export default {
   },
   data() {
     return {
-      isLoading: true, 
+      isLoading: true,
       totalSales: 0,
       activeUsers: 0,
       pendingOrders: 0,
@@ -414,6 +427,20 @@ export default {
 </script>
 
 <style scoped>
+
+/* Header Styles */
+.header-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.header-pretitle {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+
 .chart-container {
   position: relative;
   width: 100%;
@@ -424,8 +451,10 @@ export default {
 }
 
 /* General Card Styles */
-.card-title {
-  font-size: 18px;
+.card-title {  
+  letter-spacing: 1px; 
+  text-transform: uppercase; 
+  font-size: 15px;
   font-weight: 500;
   color: #333;
 }
@@ -472,22 +501,44 @@ export default {
   display: block;
 }
 
+/* Estilo para la lista */
+.list-group-item {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease;
+}
+
+.list-group-item:hover {
+  background-color: #f1f1f1;
+  transform: translateY(-3px);
+}
+
+/* Imagen más visible */
+.list-group-item img {
+  border-radius: 8px;
+  border: 2px solid #007bff;
+  transition: all 0.2s ease;
+}
+
+.list-group-item img:hover {
+  transform: scale(1.1);
+  border-color: #0056b3;
+}
+
+/* Diferenciación de filas */
+.list-group-item:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.list-group-item:nth-child(even) {
+  background-color: #ffffff;
+}
+
 /* Badge Styles */
 .badge-custom {
   font-size: 16px;
   padding: 0.5em 1em;
-}
-
-/* Header Styles */
-.header-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.header-pretitle {
-  font-size: 14px;
-  color: #6c757d;
 }
 
 /* Button Styles */

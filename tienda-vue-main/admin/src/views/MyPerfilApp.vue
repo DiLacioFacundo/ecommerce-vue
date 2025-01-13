@@ -327,9 +327,12 @@ export default {
 </script>
 
 <style scoped>
-.card-title {
-  font-size: 18px;
+.card-title {  
+  letter-spacing: 1px; 
+  text-transform: uppercase; 
+  font-size: 15px;
   font-weight: 500;
+  color: #333;
 }
 
 .profile-img {

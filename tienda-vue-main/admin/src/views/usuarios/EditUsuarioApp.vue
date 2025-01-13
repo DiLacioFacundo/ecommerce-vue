@@ -719,10 +719,11 @@ export default {
 
 /* Sección de títulos */
 .gallery-title {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
   margin-bottom: 15px;
   color: #343a40;
+  text-transform: uppercase;
 }
 
 .form-label {

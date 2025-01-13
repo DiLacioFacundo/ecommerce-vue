@@ -635,8 +635,9 @@ export default {
 }
 
 .gallery-title {
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 600;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -785,7 +786,7 @@ textarea {
   }
 
   .gallery-title {
-    font-size: 18px;
+    font-size: 12px;
   }
 }
 </style>

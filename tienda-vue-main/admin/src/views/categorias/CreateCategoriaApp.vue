@@ -224,7 +224,7 @@
                               <i class="fas fa-plus-circle"></i> Agregar
                             </button>
                           </td>
-                          <td>
+                          <td class="acciones-columna">
                             <div class="d-flex justify-content-center gap-2">
                               <button
                                 class="btn btn-outline-primary btn-sm d-flex align-items-center"
@@ -594,8 +594,10 @@ export default {
   font-weight: bold;
 }
 
-.card-title {
-  font-size: 18px;
+.card-title {  
+  letter-spacing: 1px; 
+  text-transform: uppercase; 
+  font-size: 15px;
   font-weight: 500;
   color: #333;
 }
@@ -647,7 +649,10 @@ export default {
   font-size: 15px;
   padding: 10px 15px;
 }
-
+.acciones-columna {
+  width: 100px; 
+  text-align: center; 
+}
 /* Subcategorías */
 .subcategory-container {
   padding: 10px;
@@ -657,7 +662,7 @@ export default {
 }
 
 .subcategory-list {
-    max-height: 150px;
+  max-height: 150px;
   overflow-y: auto;
   list-style: none;
   padding: 0;
@@ -698,6 +703,7 @@ export default {
   border-radius: 6px;
   font-size: 14px;
   transition: transform 0.2s ease, color 0.2s ease;
+   white-space: nowrap;
 }
 
 .btn-crear {

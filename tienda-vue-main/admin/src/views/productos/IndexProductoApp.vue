@@ -454,12 +454,13 @@ export default {
 <style scoped>
 
 /* General Card Styles */
-.card-title {
-  font-size: 18px;
+.card-title {  
+  letter-spacing: 1px; 
+  text-transform: uppercase; 
+  font-size: 15px;
   font-weight: 500;
   color: #333;
 }
-
 .card {
   border-radius: 15px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
