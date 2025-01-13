@@ -391,7 +391,6 @@
 import axios from "axios";
 import currency_formatter from "currency-formatter";
 import Notificacion from "@/components/Notificacion.vue";
-import { EventBus } from "@/utils/eventBus";
 
 export default {
   components: {

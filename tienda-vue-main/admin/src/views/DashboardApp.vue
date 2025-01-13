@@ -8,63 +8,241 @@
       <!-- Top Navigation -->
       <TopNav />
 
+      <!-- Spinner de Carga -->
+      <div v-if="isLoading" class="text-center my-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+
       <!-- Dashboard Content -->
-      <div class="container-fluid mt-4">
-        <div class="row">
-          <!-- Resumen -->
-          <div class="col-md-3">
+      <div v-else class="container-fluid">
+        <!-- Header -->
+        <div class="header mt-md-3">
+          <div class="header-body text-center">
+            <div class="row justify-content-center">
+              <div class="col-12 col-lg-10 col-xl-8">
+                <h6 class="header-pretitle">Panel Administrativo</h6>
+                <h1 class="header-title">
+                  <i class="fas fa-chart-line me-2 text-primary"></i> Dashboard
+                </h1>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumen -->
+        <div class="row g-4 justify-content-center">
+          <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm">
               <div class="card-body text-center">
-                <h6 class="text-muted">Total Ventas</h6>
+                <h4 class="text-muted">Total Ventas</h4>
                 <h3 class="text-primary">$ {{ totalSales }}</h3>
               </div>
             </div>
           </div>
-          <div class="col-md-3">
+          <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm">
               <div class="card-body text-center">
-                <h6 class="text-muted">Usuarios Activos</h6>
+                <h4 class="text-muted">Usuarios Activos</h4>
                 <h3 class="text-success">{{ activeUsers }}</h3>
               </div>
             </div>
           </div>
-          <div class="col-md-3">
+          <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm">
               <div class="card-body text-center">
-                <h6 class="text-muted">Pedidos Pendientes</h6>
+                <h4 class="text-muted">Pedidos Pendientes</h4>
                 <h3 class="text-warning">{{ pendingOrders }}</h3>
               </div>
             </div>
           </div>
-          <div class="col-md-3">
+          <div class="col-lg-3 col-md-6">
             <div class="card shadow-sm">
               <div class="card-body text-center">
-                <h6 class="text-muted">Ganancias</h6>
+                <h4 class="text-muted">Ganancias</h4>
                 <h3 class="text-danger">$ {{ earnings }}</h3>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Métricas adicionales -->
+        <div class="row g-4 justify-content-center">
+          <div class="col-lg-3 col-md-6">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <h4 class="text-muted">Pedidos Cancelados</h4>
+                <h3 class="text-danger">{{ canceledOrders }}</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="card shadow-sm">
+              <div class="card-body text-center">
+                <h4 class="text-muted">Tasa de Retención</h4>
+                <h3 class="text-info">{{ customerRetentionRate }}%</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Gráficos -->
-        <div class="row mt-4">
+        <div class="row g-4 mt-4 justify-content-center">
           <div class="col-md-6">
             <div class="card shadow-sm">
-              <div class="card-header">
-                <h5 class="mb-0">Ventas Mensuales</h5>
+              <div class="card-header text-center">
+                <h5 class="card-title">
+                  <i class="fas fa-chart-bar text-primary me-2"></i> Ventas
+                  Mensuales
+                </h5>
               </div>
-              <div class="card-body">
+              <div class="card-body chart-container">
                 <canvas id="monthlySalesChart"></canvas>
+                <p
+                  v-if="!monthlySalesData.length"
+                  class="text-muted text-center mt-3"
+                >
+                  No hay datos disponibles para este gráfico.
+                </p>
               </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="card shadow-sm">
-              <div class="card-header">
-                <h5 class="mb-0">Distribución de Pedidos</h5>
+              <div class="card-header text-center">
+                <h5 class="card-title">
+                  <i class="fas fa-chart-pie text-primary me-2"></i>
+                  Distribución de Pedidos
+                </h5>
               </div>
-              <div class="card-body">
+              <div class="card-body chart-container">
                 <canvas id="ordersDistributionChart"></canvas>
+                <p
+                  v-if="!ordersDistribution.length"
+                  class="text-muted text-center mt-3"
+                >
+                  No hay datos disponibles para este gráfico.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Productos más vendidos -->
+        <div class="row g-4 mt-4 justify-content-center">
+          <div class="col-md-12">
+            <div class="card shadow-sm">
+              <div class="card-body table-responsive">
+                <h5 class="card-title text-center">
+                  <i class="fas fa-star text-warning me-2"></i> Productos Más
+                  Vendidos
+                </h5>
+                <div class="card-body">
+                  <div v-if="topSellingProducts.length">
+                    <ul class="list-group">
+                      <li
+                        v-for="product in topSellingProducts"
+                        :key="product.titulo"
+                        class="list-group-item d-flex align-items-center"
+                      >
+                        <!-- Imagen del producto -->
+                        <img
+                          :src="formatImageUrl(product.imagen)"
+                          alt="Imagen del Producto"
+                          class="rounded-circle me-3"
+                          style="width: 50px; height: 50px; object-fit: cover"
+                        />
+                        <!-- Detalles del producto -->
+                        <div class="d-flex flex-column flex-grow-1">
+                          <span class="fw-bold">{{ product.titulo }}</span>
+                          <small class="text-muted"
+                            >Ventas: {{ product.totalVentas }}</small
+                          >
+                        </div>
+                        <!-- Botón de detalles -->
+                        <button
+                          class="btn btn-sm btn-outline-primary"
+                          @click="openProductDetails(product)"
+                        >
+                          <i class="fas fa-info-circle"></i>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                  <p v-else class="text-muted text-center mt-3">
+                    No hay productos disponibles.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Detalles del Producto -->
+        <div v-if="selectedProduct" class="row g-4 mt-4 justify-content-center">
+          <div class="col-md-12">
+            <div class="card shadow-sm">
+              <div class="card-header text-center">
+                <h5 class="card-title">
+                  <i class="fas fa-info-circle text-primary me-2"></i> Detalles
+                  del Producto
+                </h5>
+              </div>
+              <div class="card-body table-responsive">
+                <table class="table table-hover align-middle text-center">
+                  <thead class="table-primary">
+                    <tr>
+                      <th scope="col">Imagen</th>
+                      <th scope="col">Producto</th>
+                      <th scope="col">Descripción</th>
+                      <th scope="col">Precio</th>
+                      <th scope="col">Stock</th>
+                      <th scope="col">Ventas Totales</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <img
+                          :src="formatImageUrl(selectedProduct.imagen)"
+                          alt="Producto"
+                          class="rounded"
+                          style="width: 60px; height: 60px; object-fit: cover"
+                        />
+                      </td>
+                      <td>
+                        <h5
+                          class="d-flex align-items-center justify-content-center"
+                        >
+                          <i class="fas fa-tag text-primary me-2"></i>
+                          {{ selectedProduct.titulo }}
+                        </h5>
+                      </td>
+                      <td class="text-dark">
+                        {{ selectedProduct.descripcion || "Sin descripción" }}
+                      </td>
+                      <td>${{ selectedProduct.precio }}</td>
+                      <td>
+                        <span class="badge bg-success">
+                          {{ selectedProduct.stock }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge bg-info">
+                          {{ selectedProduct.totalVentas }}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-footer text-end">
+                <button
+                  class="btn btn-outline-secondary"
+                  @click="clearProductDetails"
+                >
+                  <i class="fas fa-times me-1"></i> Cerrar Detalles
+                </button>
               </div>
             </div>
           </div>
@@ -74,11 +252,12 @@
   </div>
 </template>
 
+
 <script>
 import Sidebar from "@/components/Sidebar.vue";
 import TopNav from "@/components/TopNav.vue";
 import Chart from "chart.js/auto";
-import axios from "axios"; // Asegúrate de instalar axios
+import axios from "axios";
 
 export default {
   name: "Dashboard",
@@ -88,57 +267,98 @@ export default {
   },
   data() {
     return {
+      isLoading: true, 
       totalSales: 0,
       activeUsers: 0,
       pendingOrders: 0,
       earnings: 0,
       monthlySalesData: [],
       ordersDistribution: [],
+      topSellingProducts: [],
+      customerRetentionRate: 0,
+      canceledOrders: 0,
+      selectedProduct: null,
     };
   },
   async mounted() {
     await this.fetchDashboardData();
-    this.renderMonthlySalesChart();
-    this.renderOrdersDistributionChart();
+    this.$nextTick(() => {
+      this.renderCharts();
+    });
+    this.isLoading = false;
   },
   methods: {
+    formatImageUrl(imagePath) {
+      if (!imagePath) {
+        return "/assets/images/no_image.png";
+      }
+
+      let fullUrl = `${this.$url}${imagePath}`;
+
+      // Corrige las URLs si incluyen "/api"
+      fullUrl = fullUrl.includes("/api")
+        ? fullUrl.replace("/api", "")
+        : fullUrl;
+
+      return fullUrl;
+    },
+    // Fetch de datos del backend
     async fetchDashboardData() {
       try {
-        const response = axios.get(
-          `${this.$url}/get_dashboard_data`,
-          {
-            headers: { Authorization: `Bearer ${this.$store.state.token}` },
-          }
-        );
+        const response = await axios.get(`${this.$url}/get_dashboard_data`, {
+          headers: { Authorization: `Bearer ${this.$store.state.token}` },
+        });
 
         const data = response.data;
 
-        this.totalSales = data.totalSales || 0;
-        this.activeUsers = data.activeUsers || 0;
-        this.pendingOrders = data.pendingOrders || 0;
-        this.earnings = data.totalEarnings || 0;
-        this.monthlySalesData = data.monthlySales || [];
-        this.ordersDistribution = data.ordersDistribution || [];
+        // Actualiza valores con los datos recibidos
+        this.totalSales = data?.totalSales || 0;
+        this.activeUsers = data?.activeUsers || 0;
+        this.pendingOrders = data?.pendingOrders || 0;
+        this.earnings = data?.totalEarnings || 0;
+        this.monthlySalesData = data?.monthlyEarnings || [];
+        this.ordersDistribution = data?.salesByStatus || [];
+        this.topSellingProducts = data?.topSellingProducts || [];
+        this.customerRetentionRate = data?.customerRetentionRate || 0;
+        this.canceledOrders = data?.canceledOrders || 0;
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       }
     },
+
+    // Renderiza todos los gráficos
+    renderCharts() {
+      this.$nextTick(() => {
+        this.renderMonthlySalesChart();
+        this.renderOrdersDistributionChart();
+      });
+    },
+
+    // Gráfico de Ventas Mensuales
     renderMonthlySalesChart() {
-      const ctx = document.getElementById("monthlySalesChart").getContext("2d");
+      const canvas = document.getElementById("monthlySalesChart");
+      if (!canvas) {
+        console.error(
+          "No se encontró el elemento canvas con ID 'monthlySalesChart'"
+        );
+        return;
+      }
+
+      const ctx = canvas.getContext("2d");
       new Chart(ctx, {
         type: "bar",
         data: {
-          labels: this.monthlySalesData.map((month) => month.label),
+          labels: this.monthlySalesData.map(
+            (month) => `${month.year}-${String(month.month).padStart(2, "0")}`
+          ),
           datasets: [
             {
-              label: "Ventas ($)",
-              data: this.monthlySalesData.map((month) => month.value),
-              backgroundColor: "rgba(0, 123, 255, 0.5)",
-            },
-            {
               label: "Ganancias ($)",
-              data: this.monthlySalesData.map((month) => month.earnings), // Supone que el backend también incluye "earnings" en monthlySales
-              backgroundColor: "rgba(40, 167, 69, 0.5)",
+              data: this.monthlySalesData.map((month) => month.totalGanancias),
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 2,
+              fill: true,
             },
           ],
         },
@@ -148,14 +368,27 @@ export default {
         },
       });
     },
+    // Gráfico de Distribución de Pedidos
     renderOrdersDistributionChart() {
-      const ctx = document
-        .getElementById("ordersDistributionChart")
-        .getContext("2d");
+      const canvas = document.getElementById("ordersDistributionChart");
+      if (!canvas) {
+        console.error(
+          "No se encontró el elemento canvas con ID 'ordersDistributionChart'"
+        );
+        return;
+      }
+
+      // Validar si hay datos disponibles
+      if (!this.ordersDistribution.length) {
+        console.warn("No hay datos para el gráfico de distribución de pedidos");
+        return;
+      }
+
+      const ctx = canvas.getContext("2d");
       new Chart(ctx, {
         type: "pie",
         data: {
-          labels: this.ordersDistribution.map((status) => status.label), // Supone que ordersDistribution tiene { label, value }
+          labels: this.ordersDistribution.map((status) => status.label),
           datasets: [
             {
               label: "Distribución de Pedidos",
@@ -170,42 +403,130 @@ export default {
         },
       });
     },
+    openProductDetails(product) {
+      this.selectedProduct = product;
+    },
+    clearProductDetails() {
+      this.selectedProduct = null;
+    },
   },
 };
 </script>
 
-
 <style scoped>
-.dashboard-app {
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
   display: flex;
-  height: 100vh;
+  align-items: center;
+  justify-content: center;
 }
 
-.main-content {
-  flex-grow: 1;
-  background-color: #f8f9fa;
-  overflow-y: auto;
-  padding: 20px;
+/* General Card Styles */
+.card-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
 }
 
 .card {
   border-radius: 15px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
 }
 
-.card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #ddd;
+/* Table Styles */
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-primary th {
+  background: #007bff;
+  color: white;
   font-weight: bold;
+  border: 1px solid #007bff;
   font-size: 16px;
+  padding: 12px 16px;
 }
 
-.card-body {
-  height: 300px;
+.table th,
+.table td {
+  border: 1px solid #007bff;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 15px;
+  padding: 10px 15px;
 }
 
-canvas {
-  width: 100% !important;
-  height: 100% !important;
+/* Table Responsive */
+.table-responsive {
+  max-height: 700px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 8px;
+  display: block;
+}
+
+/* Badge Styles */
+.badge-custom {
+  font-size: 16px;
+  padding: 0.5em 1em;
+}
+
+/* Header Styles */
+.header-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.header-pretitle {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+/* Button Styles */
+.btn {
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 8px 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-group .btn {
+  margin-right: 8px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Spinner Styles */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Centered Content */
+.d-flex {
+  display: flex;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.text-center {
+  text-align: center;
 }
 </style>

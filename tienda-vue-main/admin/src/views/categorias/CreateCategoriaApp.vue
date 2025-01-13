@@ -28,7 +28,7 @@
             </div>
 
             <!-- Crear Nueva Categoría -->
-            <div class="card shadow-sm mb-4 grow-on-hover category-card">
+            <div class="card shadow-sm mb-4 category-card">
               <div class="card-body">
                 <h5 class="card-title text-center">
                   <i class="fas fa-plus-circle text-success me-2"></i>
@@ -60,7 +60,7 @@
             </div>
 
             <!-- Tabla de Categorías -->
-            <div class="card shadow-sm grow-on-hover">
+            <div class="card shadow-sm">
               <div class="card-body">
                 <h5 class="card-title text-center">
                   <i class="fas fa-list-alt text-primary me-2"></i>

@@ -1,209 +1,317 @@
 <template>
-  <div class="dashboard-app">
-    <!-- Sidebar -->
-    <Sidebar />
-
-    <!-- Main Content -->
-    <div class="main-content">
-      <!-- Top Navigation -->
-      <TopNav />
-
-      <!-- Dashboard Content -->
-      <div class="container-fluid mt-4">
-        <div class="row">
-          <!-- Resumen -->
-          <div class="col-md-3">
-            <div class="card shadow-sm">
-              <div class="card-body text-center">
-                <h6 class="text-muted">Total Ventas</h6>
-                <h3 class="text-primary">$ {{ totalSales }}</h3>
-              </div>
-            </div>
+  <div class="modal-wrapper" v-if="isVisible">
+    <!-- Notificación -->
+    <notificacion
+      v-if="notificationVisible"
+      :message="notificationMessage"
+      :type="notificationType"
+      @close="notificationVisible = false"
+    />
+    <!-- Modal -->
+    <div class="modal-card" :class="{ 'fade-out': isClosing }">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-folder-plus text-primary me-2"></i> Crear
+          Subcategoría
+        </h5>
+        <button class="btn-close" @click="iniciarCierre">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-subtitle text-muted">
+          <i class="fas fa-folder-open text-info me-2"></i>
+          <strong>Categoría Seleccionada:</strong> {{ categoriaNombre }}
+        </p>
+        <form @submit.prevent="crearSubcategoria">
+          <div class="form-group">
+            <label for="titulo">
+              <i class="fas fa-pen text-success me-2"></i> Título de la
+              Subcategoría
+            </label>
+            <input
+              id="titulo"
+              v-model="titulo"
+              type="text"
+              class="form-control"
+              placeholder="Escribe el título de la subcategoría"
+            />
           </div>
-          <div class="col-md-3">
-            <div class="card shadow-sm">
-              <div class="card-body text-center">
-                <h6 class="text-muted">Usuarios Activos</h6>
-                <h3 class="text-success">{{ activeUsers }}</h3>
-              </div>
-            </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-check-circle me-2"></i> Crear
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="iniciarCierre"
+            >
+              <i class="fas fa-times-circle me-2"></i> Cancelar
+            </button>
           </div>
-          <div class="col-md-3">
-            <div class="card shadow-sm">
-              <div class="card-body text-center">
-                <h6 class="text-muted">Pedidos Pendientes</h6>
-                <h3 class="text-warning">{{ pendingOrders }}</h3>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card shadow-sm">
-              <div class="card-body text-center">
-                <h6 class="text-muted">Ganancias</h6>
-                <h3 class="text-danger">$ {{ earnings }}</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Gráficos -->
-        <div class="row mt-4">
-          <div class="col-md-6">
-            <div class="card shadow-sm">
-              <div class="card-header">
-                <h5 class="mb-0">Ventas Mensuales</h5>
-              </div>
-              <div class="card-body">
-                <canvas id="monthlySalesChart"></canvas>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="card shadow-sm">
-              <div class="card-header">
-                <h5 class="mb-0">Distribución de Pedidos</h5>
-              </div>
-              <div class="card-body">
-                <canvas id="ordersDistributionChart"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
+        </form>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import Sidebar from "@/components/Sidebar.vue";
-import TopNav from "@/components/TopNav.vue";
-import Chart from "chart.js/auto";
 import axios from "axios";
+import Notificacion from "@/components/Notificacion.vue";
 
 export default {
-  name: "Dashboard",
-  components: {
-    Sidebar,
-    TopNav,
-  },
+  components: { Notificacion },
   data() {
     return {
-      totalSales: 0,
-      activeUsers: 0,
-      pendingOrders: 0,
-      earnings: 0,
-      monthlySalesData: [],
-      ordersDistribution: [],
+      titulo: "",
+      categoriaNombre: "",
+      isVisible: true,
+      isClosing: false,
+      notificationVisible: false,
+      notificationMessage: "",
+      notificationType: "info",
     };
   },
-  async mounted() {
-    await this.fetchDashboardData();
-    this.renderMonthlySalesChart();
-    this.renderOrdersDistributionChart();
+  computed: {
+    categoriaId() {
+      return this.$route.params.categoriaId;
+    },
   },
   methods: {
-    async fetchDashboardData() {
+    handleSubcategoriaCreada(message) {
+      this.showNotification(message, "success");
+      this.cargarCategorias();
+      this.cerrarModalSubcategoria();
+    },
+    handleError(errorMessage) {
+      this.showNotification(errorMessage, "error");
+    },
+    cerrarModalSubcategoria() {
+      this.modalSubcategoriaVisible = false;
+    },
+    showNotification(message, type) {
+      this.notificationMessage = message;
+      this.notificationType = type;
+      this.notificationVisible = true;
+
+      setTimeout(() => {
+        this.notificationVisible = false;
+      }, 3000);
+    },
+    async cargarCategoria() {
       try {
         const response = await axios.get(
-          `${this.$url}/dashboard/get_dashboard_data`,
-          {
-            headers: { Authorization: `Bearer ${this.$store.state.token}` },
-          }
+          `${this.$url}/obtener_categoria_admin/${this.categoriaId}`,
+          { headers: { Authorization: `Bearer ${this.$store.state.token}` } }
         );
-        const data = response.data;
-
-        this.totalSales = data.totalSales || 0;
-        this.activeUsers = data.activeUsers || 0;
-        this.pendingOrders = data.pendingOrders || 0;
-        this.earnings = data.totalEarnings || 0;
-        this.monthlySalesData = data.monthlySales || [];
-        this.ordersDistribution = data.ordersDistribution || [];
+        this.categoriaNombre = response.data.data.titulo;
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
+        // Verificar si hay un mensaje de error del servidor
+        const errorMessage =
+          error.response && error.response.data && error.response.data.message
+            ? error.response.data.message
+            : "No se pudo cargar la información de la categoría. Intenta nuevamente.";
+        // Mostrar el mensaje del servidor como notificación
+        this.showNotification(errorMessage, "error");
       }
     },
-    renderMonthlySalesChart() {
-      const ctx = document.getElementById("monthlySalesChart").getContext("2d");
-      new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: this.monthlySalesData.map((month) => month.label),
-          datasets: [
-            {
-              label: "Ventas ($)",
-              data: this.monthlySalesData.map((month) => month.value),
-              backgroundColor: "rgba(0, 123, 255, 0.5)",
-            },
-            {
-              label: "Ganancias ($)",
-              data: this.monthlySalesData.map((month) => month.earnings),
-              backgroundColor: "rgba(40, 167, 69, 0.5)",
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-        },
-      });
+    async crearSubcategoria() {
+      try {
+        await axios.post(
+          `${this.$url}/registrar_subcategoria_admin`,
+          {
+            categoria: this.categoriaId,
+            titulo: this.titulo,
+          },
+          { headers: { Authorization: `Bearer ${this.$store.state.token}` } }
+        );
+        this.showNotification("Subcategoría creada exitosamente.", "success");
+
+        // Cierra el modal después de la creación exitosa
+        this.iniciarCierre();
+      } catch (error) {
+        if (error.response && error.response.status === 400) {
+          this.showNotification(
+            error.response.data.message || "Solicitud inválida.",
+            "error"
+          );
+        } else if (error.response && error.response.status === 500) {
+          this.showNotification(
+            "Error del servidor. Inténtalo más tarde.",
+            "error"
+          );
+        } else {
+          this.showNotification("Error de conexión. Verifica tu red.", "error");
+        }
+      }
     },
-    renderOrdersDistributionChart() {
-      const ctx = document
-        .getElementById("ordersDistributionChart")
-        .getContext("2d");
-      new Chart(ctx, {
-        type: "pie",
-        data: {
-          labels: this.ordersDistribution.map((status) => status.label),
-          datasets: [
-            {
-              label: "Distribución de Pedidos",
-              data: this.ordersDistribution.map((status) => status.value),
-              backgroundColor: ["#ffc107", "#17a2b8", "#28a745", "#dc3545"],
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-        },
-      });
+    iniciarCierre() {
+      this.isClosing = true;
+      setTimeout(() => {
+        this.isVisible = false;
+        this.$router.push("/categorias");
+      }, 500);
     },
+  },
+  mounted() {
+    this.cargarCategoria();
   },
 };
 </script>
 
 <style scoped>
-.dashboard-app {
+/* Fondo con transparencia más clara */
+.modal-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
-  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9); /* Fondo claro */
+  backdrop-filter: blur(10px);
+  z-index: 1050;
 }
 
-.main-content {
-  flex-grow: 1;
-  background-color: #f8f9fa;
-  overflow-y: auto;
-  padding: 20px;
+/* Tarjeta del modal */
+.modal-card {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90%;
+  padding: 25px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease;
+  transition: transform 0.3s, opacity 0.3s;
+  transform: translateY(0);
 }
 
-.card {
-  border-radius: 15px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+/* Animación de cierre */
+.modal-card.fade-out {
+  animation: fadeOut 0.3s ease;
+  transform: translateY(-20px);
+  opacity: 0;
 }
 
-.card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #ddd;
+/* Encabezado */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.modal-title {
+  font-size: 24px;
   font-weight: bold;
+  color: #333;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.btn-close:hover {
+  color: #333;
+}
+
+/* Cuerpo */
+.modal-body {
+  padding: 20px 0;
+}
+
+.modal-subtitle {
   font-size: 16px;
+  margin-bottom: 15px;
+  color: #555;
 }
 
-.card-body {
-  height: 300px;
+/* Pie */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 10px;
 }
 
-canvas {
-  width: 100% !important;
-  height: 100% !important;
+/* Estilos de botones */
+.form-group {
+  margin-bottom: 20px;
+}
+
+input.form-control {
+  padding: 10px 15px;
+  width: 100%;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
+}
+
+button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
 }
 </style>

@@ -495,15 +495,6 @@ export default {
   padding-top: 15px;
 }
 
-/* Hover Effects */
-.grow-on-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.grow-on-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
 
 /* Table Responsive */
 .table-responsive {
