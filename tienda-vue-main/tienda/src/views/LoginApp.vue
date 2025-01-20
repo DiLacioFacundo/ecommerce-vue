@@ -233,6 +233,10 @@ export default {
         this.notificacion.visible = false;
       }, this.notificacion.duration);
     },
+    validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    },
     validar_registro() {
       if (!this.cliente.nombres) {
         this.msm_error = "Por favor, ingresa tu nombre completo.";
@@ -271,10 +275,13 @@ export default {
     login() {
       if (!this.email) {
         this.msm_error_login = "Por favor, ingresa tu correo electrónico.";
+      } else if (!this.validateEmail(this.email)) {
+        this.msm_error_login = "Por favor, ingresa un correo válido.";
       } else if (!this.password) {
         this.msm_error_login = "Por favor, ingresa tu contraseña.";
       } else {
         this.msm_error_login = "";
+        this.isLoading = true;
         const data = {
           email: this.email,
           password: this.password,
@@ -284,6 +291,7 @@ export default {
             headers: { "Content-Type": "application/json" },
           })
           .then((result) => {
+            this.isLoading = false;
             if (result.data.message) {
               this.showNotification(result.data.message, "error");
             } else {
@@ -294,11 +302,19 @@ export default {
             }
           })
           .catch((error) => {
-            console.error(error);
-            this.showNotification(
-              "Error al iniciar sesión. Verifica tus credenciales.",
-              "error"
-            );
+            this.isLoading = false;
+            if (
+              error.response &&
+              error.response.data &&
+              error.response.data.message
+            ) {
+              this.showNotification(error.response.data.message, "error");
+            } else {
+              this.showNotification(
+                "Error al iniciar sesión. Verifica tus credenciales.",
+                "error"
+              );
+            }
           });
       }
     },

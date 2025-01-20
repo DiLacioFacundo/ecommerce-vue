@@ -380,7 +380,7 @@ export default {
       } catch (error) {
         this.showNotification(
           "Error al cargar los datos del producto.",
-          "danger"
+          "error"
         );
         this.$router.push({ name: "producto-index" });
       }
@@ -402,7 +402,7 @@ export default {
           }));
         }
       } catch (error) {
-        this.showNotification("Error al cargar las categorías.", "danger");
+        this.showNotification("Error al cargar las categorías.", "error");
       }
     },
     // Cargar subcategorías basadas en categoría
@@ -426,7 +426,7 @@ export default {
           this.subcategorias = [];
         }
       } catch (error) {
-        this.showNotification("Error al cargar subcategorías.", "danger");
+        this.showNotification("Error al cargar subcategorías.", "error");
       }
     },
     // Subir nueva imagen

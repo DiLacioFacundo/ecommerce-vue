@@ -299,7 +299,7 @@ export default {
         });
       } catch (error) {
         console.error("Error al cargar usuarios:", error);
-        this.showNotification("Error al cargar usuarios.", "danger");
+        this.showNotification("Error al cargar usuarios.", "error");
       } finally {
         this.loading = false;
       }
@@ -322,7 +322,7 @@ export default {
           this.usuarios = this.usuarios.filter((usuario) => usuario._id !== id);
           this.showNotification("Usuario eliminado exitosamente.", "success");
         } catch (error) {
-          this.showNotification("Error al eliminar el usuario.", "danger");
+          this.showNotification("Error al eliminar el usuario.", "error");
         }
       }
     },

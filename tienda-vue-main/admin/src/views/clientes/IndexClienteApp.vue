@@ -656,7 +656,7 @@ export default {
       if (this.passwordMismatch) {
         this.showNotification(
           "Las contraseñas no coinciden. Por favor, corrige el error.",
-          "danger"
+          "error"
         );
         return;
       }
@@ -674,7 +674,7 @@ export default {
         this.showNotification("Cliente actualizado exitosamente.", "success");
         this.selectedCliente = null;
       } catch (error) {
-        this.showNotification("Error al actualizar cliente.", "danger");
+        this.showNotification("Error al actualizar cliente.", "error");
       }
     },
     async deleteCliente(id) {

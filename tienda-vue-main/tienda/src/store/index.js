@@ -1,12 +1,13 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import * as jwtDecode from "jwt-decode";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     token: localStorage.getItem('token') || null,
-    user: null,
+    user: JSON.parse(localStorage.getItem('user_data')) || null,
   },
   getters: {
     isLoggedIn: (state) => !!state.token,
@@ -40,14 +41,24 @@ export default new Vuex.Store({
     },
     decodeAndSaveToken({ commit }, token) {
       try {
-        const jwtDecodeFn = jwtDecode.default || jwtDecode; // Garantiza compatibilidad
-        const decodedToken = jwtDecodeFn(token);
+        const decodedToken = jwtDecode(token);
         commit('setToken', token);
         commit('setUser', decodedToken);
         localStorage.setItem('token', token);
         localStorage.setItem('user_data', JSON.stringify(decodedToken));
       } catch (error) {
         console.error('Error al decodificar el token:', error);
+      }
+    },
+    initializeAuth({ commit }) {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user_data'));
+
+      if (token) {
+        commit('setToken', token);
+      }
+      if (user) {
+        commit('setUser', user);
       }
     },
   },

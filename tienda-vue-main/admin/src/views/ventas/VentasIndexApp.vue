@@ -771,11 +771,6 @@ export default {
   margin: 0;
 }
 
-.text-muted {
-  font-size: 16px;
-  color: #6c757d; /* Gris claro */
-}
-
 @media (max-width: 768px) {
   .table {
     font-size: 14px;

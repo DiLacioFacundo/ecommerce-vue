@@ -215,16 +215,16 @@ export default {
   },
   data() {
     return {
-      userProfile: {}, // Datos del cliente
-      editedData: {}, // Datos para editar
+      userProfile: {}, 
+      editedData: {}, 
       passwordData: {
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       },
       isAuthenticated: false,
-      editing: false, // Modo edición
-      changingPassword: false, // Modo cambio de contraseña
+      editing: false, 
+      changingPassword: false, 
       notificacion: {
         visible: false,
         message: "",
@@ -259,7 +259,6 @@ export default {
     };
   },
   computed: {
-
     currentUser() {
       return this.$store.getters.currentUser || {};
     },
@@ -277,10 +276,13 @@ export default {
     async getClientData() {
       try {
         const response = await axios.get(
-          `${this.$url}/clientes/${this.currentUser.id}`,
+          `${this.$url}/clientes`, // Cambia el endpoint según sea necesario
           {
             headers: {
               Authorization: `Bearer ${this.$store.state.token}`,
+            },
+            params: {
+              email: this.currentUser.email, // Envía el email como parámetro
             },
           }
         );

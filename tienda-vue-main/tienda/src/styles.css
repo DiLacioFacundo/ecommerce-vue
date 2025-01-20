@@ -8,6 +8,7 @@
   padding: 0.5rem 1rem;
   transition: all 0.3s ease, transform 0.2s ease; /* Transiciones suaves */
   cursor: pointer;
+  color: inherit;
 }
 .btn-lg {
   padding: 0.75rem 1.5rem;
@@ -62,14 +63,16 @@
 }
 
 .btn-success:hover {
-  background-color: #218838;
-  border-color: #1e7e34;
+  background-color: #218838; 
+  border-color: #1e7e34; 
+  color: #ffffff; 
 }
 
 .btn-success:active {
   background-color: #1c7430;
-  border-color: #1c7430;
+  border-color: #1c7430; 
   transform: scale(0.95);
+  color: #ffffff; 
 }
 
 /* BTN DANGER */
@@ -189,17 +192,53 @@
 
 /* ESTILOS ÍCONOS DENTRO DEL BOTÓN */
 .btn i {
-  transition: transform 0.2s ease;
+  color: inherit; 
+  transition: transform 0.2s ease, color 0.3s ease;
 }
 
 .btn:hover i {
-  transform: scale(1.1); /* Crecimiento del ícono */
+  transform: scale(1.1); 
+  color: inherit; 
+}
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
 }
 
 /* ANIMACIONES */
 .btn:active {
-  transform: scale(0.95); /* Efecto de presión */
+  transform: scale(0.95); 
 }
+
+/* Botón de Iniciar Sesión */
+.btn-outline-light {
+  color: #ffffff; /* Texto blanco */
+  background-color: #007bff; 
+  border-color: #007bff; 
+  transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+  background-color: #0056b3; 
+  border-color: #0056b3; 
+  color: #ffffff; 
+}
+
+/* Botón de Carrito */
+.btn-cart {
+  color: #ffffff; 
+  background-color: #007bff; 
+  border-color: #007bff; 
+  transition: all 0.3s ease;
+}
+
+.btn-cart:hover {
+  background-color: #0056b3; 
+  border-color: #0056b3; 
+  color: #ffffff;
+}
+
+
 
 .btn:focus {
   outline: none;
@@ -218,5 +257,5 @@
 .form-label {
   font-weight: bold;
   color: #495057;
-  font-size: 12px; /* Aumenta el tamaño de la etiqueta */
+  font-size: 12px; 
 }

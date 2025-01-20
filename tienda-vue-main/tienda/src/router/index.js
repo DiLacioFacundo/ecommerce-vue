@@ -33,12 +33,12 @@ const routes = [
   {
     path: '/profile',
     name: 'profile',
-    component: () => import('@/views/ProfileView.vue')
+    component: () => import('@/views/usuarios/ProfileView.vue')
   },
   {
     path: '/orders',
     name: 'orders',
-    component: () => import('@/views/OrdersView.vue')
+    component: () => import('@/views/usuarios/MyPurchasesView.vue')
   },
   { path: '/contact', name: 'contact', component: () => import('@/views/Contact.vue') },
   { path: '/categories', name: 'categories', component: () => import('@/views/CategoriesView.vue') }

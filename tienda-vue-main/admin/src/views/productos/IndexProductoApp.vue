@@ -368,7 +368,7 @@ export default {
         }
       } catch (error) {
         console.error("Error cargando datos:", error);
-        this.showNotification("Error al cargar los datos.", "danger");
+        this.showNotification("Error al cargar los datos.", "error");
       } finally {
         this.load_data = false;
       }
@@ -393,7 +393,7 @@ export default {
         }));
       } catch (error) {
         console.error("Error cargando subcategorías:", error);
-        this.showNotification("Error al cargar subcategorías.", "danger");
+        this.showNotification("Error al cargar subcategorías.", "error");
       }
     },
     convertDate(date) {
@@ -419,7 +419,7 @@ export default {
           );
           this.showNotification("Producto eliminado exitosamente.", "success");
         } catch (error) {
-          this.showNotification("Error al eliminar el producto.", "danger");
+          this.showNotification("Error al eliminar el producto.", "error");
         }
       }
     },

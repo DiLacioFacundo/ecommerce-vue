@@ -1,4 +1,4 @@
-var Cliente = require('../models/cliente');
+const Cliente = require('../models/cliente');
 var jwt = require('../helpers/jwt');
 const bcrypt = require('bcrypt-nodejs');
 
@@ -135,56 +135,81 @@ const eliminar_cliente = async function (req, res) {
 
 const obtener_cliente = async function (req, res) {
     try {
-        const id = req.params.id;
+        const { email } = req.query; // Obtener el email de los query parameters
 
-        // Verificar si el cliente existe
+        if (!email) {
+            return res.status(400).send({ message: "Email de cliente requerido." });
+        }
+
+        const cliente = await Cliente.findOne({ email });
+        if (!cliente) {
+            return res.status(404).send({ message: "Cliente no encontrado." });
+        }
+
+        res.status(200).send({ cliente });
+    } catch (error) {
+        console.error("Error al obtener cliente:", error);
+        res.status(500).send({ message: "Ocurrió un error al obtener el cliente." });
+    }
+};
+
+
+const cambiar_password = async (req, res) => {
+    try {
+        const { id } = req.params; // ID del cliente (obtenido de la ruta)
+        const { currentPassword, newPassword } = req.body; // Contraseña actual y nueva
+
+        // Validar que los datos estén completos
+        if (!currentPassword || !newPassword) {
+            return res.status(400).send({ message: 'Todos los campos son obligatorios.' });
+        }
+
+        // Buscar el cliente por ID
         const cliente = await Cliente.findById(id);
         if (!cliente) {
             return res.status(404).send({ message: 'Cliente no encontrado.' });
         }
 
-        res.status(200).send({ cliente });
+        // Comparar la contraseña actual con la almacenada
+        const match = await bcrypt.compare(currentPassword, cliente.password);
+        if (!match) {
+            return res.status(401).send({ message: 'La contraseña actual es incorrecta.' });
+        }
+
+        // Generar un hash para la nueva contraseña
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+        // Actualizar la contraseña del cliente
+        cliente.password = hashedPassword;
+        await cliente.save();
+
+        res.status(200).send({ message: 'Contraseña actualizada correctamente.' });
     } catch (error) {
-        console.error('Error al obtener cliente:', error);
-        res.status(500).send({ message: 'Ocurrió un error al obtener el cliente.' });
+        console.error('Error al cambiar la contraseña:', error);
+        res.status(500).send({ message: 'Ocurrió un error al cambiar la contraseña.' });
     }
 };
 
-const cambiar_password = async (req, res) => {
-  try {
-    const { id } = req.params; // ID del cliente (obtenido de la ruta)
-    const { currentPassword, newPassword } = req.body; // Contraseña actual y nueva
+const obtener_compras_cliente = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log("ID recibido en el endpoint:", id);
 
-    // Validar que los datos estén completos
-    if (!currentPassword || !newPassword) {
-      return res.status(400).send({ message: 'Todos los campos son obligatorios.' });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send({ message: "ID de cliente no válido." });
+        }
+
+        const cliente = await Cliente.findById(id);
+        if (!cliente) {
+            return res.status(404).send({ message: "Cliente no encontrado." });
+        }
+
+        // Continuar lógica...
+    } catch (error) {
+        console.error("Error al obtener las compras:", error);
+        res.status(500).send({ message: "Ocurrió un error al obtener las compras." });
     }
-
-    // Buscar el cliente por ID
-    const cliente = await Cliente.findById(id);
-    if (!cliente) {
-      return res.status(404).send({ message: 'Cliente no encontrado.' });
-    }
-
-    // Comparar la contraseña actual con la almacenada
-    const match = await bcrypt.compare(currentPassword, cliente.password);
-    if (!match) {
-      return res.status(401).send({ message: 'La contraseña actual es incorrecta.' });
-    }
-
-    // Generar un hash para la nueva contraseña
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-
-    // Actualizar la contraseña del cliente
-    cliente.password = hashedPassword;
-    await cliente.save();
-
-    res.status(200).send({ message: 'Contraseña actualizada correctamente.' });
-  } catch (error) {
-    console.error('Error al cambiar la contraseña:', error);
-    res.status(500).send({ message: 'Ocurrió un error al cambiar la contraseña.' });
-  }
 };
 
 
@@ -195,5 +220,6 @@ module.exports = {
     listar_clientes,
     actualizar_cliente,
     cambiar_password,
+    obtener_compras_cliente,
     eliminar_cliente
 };

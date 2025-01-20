@@ -89,6 +89,7 @@
 
         <!-- Gráficos -->
         <div class="row g-4 mt-4 justify-content-center">
+          <!-- Gráfico de Ventas Mensuales -->
           <div class="col-md-6">
             <div class="card shadow-sm">
               <div class="card-header text-center">
@@ -98,16 +99,18 @@
                 </h5>
               </div>
               <div class="card-body chart-container">
-                <canvas id="monthlySalesChart"></canvas>
-                <p
-                  v-if="!monthlySalesData.length"
-                  class="text-muted text-center mt-3"
-                >
-                  No hay datos disponibles para este gráfico.
-                </p>
+                <div v-if="monthlySalesData.length">
+                  <canvas id="monthlySalesChart"></canvas>
+                </div>
+                <div v-else class="text-center-message">
+                  <i class="fas fa-info-circle"></i>
+                  <p>No hay datos disponibles para este gráfico.</p>
+                </div>
               </div>
             </div>
           </div>
+
+          <!-- Gráfico de Distribución de Pedidos -->
           <div class="col-md-6">
             <div class="card shadow-sm">
               <div class="card-header text-center">
@@ -117,19 +120,19 @@
                 </h5>
               </div>
               <div class="card-body chart-container">
-                <canvas id="ordersDistributionChart"></canvas>
-                <p
-                  v-if="!ordersDistribution.length"
-                  class="text-muted text-center mt-3"
-                >
-                  No hay datos disponibles para este gráfico.
-                </p>
+                <div v-if="ordersDistribution.length">
+                  <canvas id="ordersDistributionChart"></canvas>
+                </div>
+                <div v-else class="text-center-message">
+                  <i class="fas fa-info-circle"></i>
+                  <p>No hay datos disponibles para este gráfico.</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Productos más vendidos -->
+        <!-- Productos Más Vendidos -->
         <div class="row g-4 mt-4 justify-content-center">
           <div class="col-md-12">
             <div class="card shadow-sm">
@@ -182,9 +185,10 @@
                       </li>
                     </ul>
                   </div>
-                  <p v-else class="text-muted text-center mt-3">
-                    No hay productos disponibles.
-                  </p>
+                  <div v-else class="text-center-message">
+                    <i class="fas fa-info-circle"></i>
+                    <p>No hay productos disponibles.</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -427,7 +431,6 @@ export default {
 </script>
 
 <style scoped>
-
 /* Header Styles */
 .header-title {
   font-size: 24px;
@@ -440,7 +443,6 @@ export default {
   color: #6c757d;
 }
 
-
 .chart-container {
   position: relative;
   width: 100%;
@@ -450,10 +452,39 @@ export default {
   justify-content: center;
 }
 
+.text-center-message {
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  font-weight: bold;
+  color: #95aac9;
+  text-transform: uppercase;
+  font-size: 14px;
+  background-color: #f8f9fa;
+  border: 2px dashed #cbd5e0;
+  border-radius: 10px;
+  padding: 10px 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  gap: 10px;
+}
+
+.text-center-message i {
+  font-size: 20px;
+  color: #007bff;
+}
+
+.text-center-message p {
+  margin: 0;
+  font-size: 14px;
+  color: inherit;
+}
+
 /* General Card Styles */
-.card-title {  
-  letter-spacing: 1px; 
-  text-transform: uppercase; 
+.card-title {
+  letter-spacing: 1px;
+  text-transform: uppercase;
   font-size: 15px;
   font-weight: 500;
   color: #333;

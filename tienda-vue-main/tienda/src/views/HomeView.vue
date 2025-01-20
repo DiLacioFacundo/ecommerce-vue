@@ -340,6 +340,7 @@ export default {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   padding: 10px;
   display: flex;
+  text-align: center;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
@@ -357,6 +358,14 @@ export default {
   object-fit: contain;
   margin-bottom: 15px;
   border-radius: 8px;
+}
+
+.product h6 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  max-width: 100%;
 }
 
 .product h6,
@@ -379,6 +388,20 @@ export default {
 .carousel .row.g-4 {
   margin: 0;
   padding: 0;
+}
+
+@media (max-width: 768px) {
+  .carousel .col-lg-3 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+@media (max-width: 576px) {
+  .carousel .col-lg-3 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
 }
 
 /* Animación adicional */
