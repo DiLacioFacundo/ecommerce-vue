@@ -107,11 +107,6 @@
                     />
                   </div>
                 </div>
-                <div class="text-center">
-                  <button type="submit" class="btn btn-success w-50">
-                    <i class="fas fa-save me-2"></i> Guardar Informacion
-                  </button>
-                </div>
               </form>
             </div>
 
@@ -180,9 +175,11 @@
                   <span>{{ convertCurrency(total + envio) }}</span>
                 </li>
               </ul>
-              <button class="btn btn-secondary w-100" @click="guardarVenta">
-                <i class="fas fa-credit-card me-2"></i> Pagar
+              <button class="btn btn-secondary w-100" @click="onPagarClick">
+                <i class="fas fa-credit-card me-2"></i> Pagar con Mercado Pago
               </button>
+              <!-- Contenedor del Brick -->
+              <div id="paymentBrick_container" class="mt-4"></div>
             </div>
           </div>
         </div>
@@ -192,7 +189,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import currency_formatter from "currency-formatter";
 import Notificacion from "@/components/Notificacion.vue";
 
@@ -201,6 +197,7 @@ export default {
   data() {
     return {
       notificacion: { visible: false, message: "", type: "", duration: 3000 },
+      paymentBrickController: null,
       direcciones: [],
       productos: [],
       total: 0,
@@ -231,28 +228,6 @@ export default {
       }
 
       return `${this.$url.replace(/\/api$/, "")}${imageUrl}`;
-    },
-
-    guardarInformacion() {
-      try {
-        if (
-          !this.nuevaDireccion.nombreCompleto ||
-          !this.nuevaDireccion.telefono ||
-          !this.nuevaDireccion.ciudad ||
-          !this.nuevaDireccion.pais ||
-          !this.nuevaDireccion.direccion ||
-          !this.nuevaDireccion.codigoPostal
-        ) {
-          throw new Error(
-            "Por favor, completa todos los campos de la dirección."
-          );
-        }
-
-        this.venta.direccion = this.nuevaDireccion;
-        this.showNotification("Datos Ingresado correctamente.", "success");
-      } catch (error) {
-        this.handleValidationError(error);
-      }
     },
     validateDireccion(direccion) {
       if (
@@ -328,105 +303,90 @@ export default {
 
       console.log("Productos procesados con variantes:", this.productos);
     },
-
-    guardarVenta() {
-      const token = localStorage.getItem("token");
-      const cliente = this.currentUser;
-
-      if (!token || !cliente || !this.venta.direccion) {
-        const errorMessage =
-          !token || !cliente
-            ? "Debes iniciar sesión para realizar una compra."
-            : "Por favor, ingresa una dirección de entrega.";
-        this.showNotification(errorMessage, "error");
-        return;
-      }
-
-      try {
-        // 1. Mostrar productos antes de procesar
-        console.log("Productos en la venta:", this.productos);
-
-        const detallesValidados = this.productos.map((item) => {
-          const { producto, variedad, cantidad } = item;
-
-          // Reemplazar espacios en el ID del producto antes de enviarlo
-          const productoId = producto._id.replace(/\s+/g, "_"); // Reemplaza espacios con guiones bajos
-
-          if (!productoId) {
-            throw new Error(
-              `Productos inválidos. Producto: ${
-                producto?.titulo || "Desconocido"
-              }`
-            );
-          }
-
-          const precioVariedad = variedad.precio || producto.precio;
-
-          if (!precioVariedad || isNaN(precioVariedad)) {
-            throw new Error(
-              `Precio inválido para el producto ${producto.titulo}.`
-            );
-          }
-
-          return {
-            subtotal: precioVariedad * cantidad,
-            precio_unidad: precioVariedad,
-            cantidad,
-            producto: productoId, // Producto con el ID corregido
-            variedad: variedad,
-            nombre_variedad: variedad.variedad,
-          };
+    async loadMercadoPagoSdk() {
+      if (!window.MercadoPago) {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://sdk.mercadopago.com/js/v2";
+          script.async = true;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
         });
+      }
+    },
 
-        // 2. Mostrar detalles antes de enviarlos
-        console.log("Detalles validados:", detallesValidados);
-
-        const dataVenta = {
-          cliente: cliente.id,
-          direccion: this.venta.direccion,
-          total: this.total + this.envio,
-          envio: this.envio,
-          detalles: detallesValidados,
-        };
-
-        // 3. Mostrar datos que se van a enviar al servidor
-        console.log("Datos de la venta a enviar:", dataVenta);
-
-        axios
-          .post(`${this.$url}/ventas/guardar`, dataVenta, {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-          .then((response) => {
-            console.log("Respuesta del servidor:", response.data);
-
-            // Vaciar el carrito y el localStorage
-            localStorage.removeItem("carrito");
-            this.productos = [];
-            this.total = 0;
-
-            // Mostrar notificación de éxito
-            this.showNotification(
-              "Pago procesado y venta registrada correctamente.",
-              "success"
-            );
-
-            // Redirigir a la página de confirmación o inicio
-            this.$router.push("/success"); // Cambia "/success" según tu ruta de confirmación
-          })
-          .catch((error) => {
-            console.error(
-              "Error al registrar la venta:",
-              error.response || error
-            );
-            this.showNotification(
-              "Error al registrar la venta. Inténtalo de nuevo.",
-              "error"
-            );
-          });
-      } catch (error) {
-        console.error("Error en la validación de los detalles:", error.message);
+    async onPagarClick() {
+      try {
+        this.validateDireccion(this.nuevaDireccion);
+        this.venta.direccion = this.nuevaDireccion;
         this.showNotification(
-          "Error en los detalles de la compra. Verifica los datos.",
+          "Dirección validada. Mostrando medios de pago...",
+          "success"
+        );
+        await this.renderPaymentBrick();
+      } catch (error) {
+        this.showNotification(error.message, "error");
+      }
+    },
+    async renderPaymentBrick() {
+      try {
+        await this.loadMercadoPagoSdk();
+
+        const mp = new window.MercadoPago(
+          "TEST-ea30bf4a-b65c-4d1f-b2c9-b76067e9230a",
+          {
+            locale: "es-AR",
+          }
+        );
+
+        const bricksBuilder = mp.bricks();
+
+        if (this.paymentBrickController) {
+          await this.paymentBrickController.destroy(); // ✅ evita múltiples renders
+        }
+
+        this.paymentBrickController = await bricksBuilder.create(
+          "payment",
+          "paymentBrick_container",
+          {
+            initialization: {
+              amount: Number(this.total) + Number(this.envio),
+              payer: {
+                email: "test_user_1023024555@testuser.com",
+                firstName: "Test",
+                lastName: "User",
+                entityType: "individual",
+              },
+            },
+            customization: {
+              visual: { style: { theme: "default" } },
+              paymentMethods: {
+                creditCard: "all",
+                debitCard: "all",
+                ticket: "all",
+                bankTransfer: "all",
+                atm: "all",
+                wallet_purchase: "all",
+                maxInstallments: 12,
+              },
+            },
+            callbacks: {
+              onReady: () => console.log("✅ Brick listo"),
+              onSubmit: async ({ selectedPaymentMethod, formData }) => {
+                // tu lógica de pago
+              },
+              onError: (error) => {
+                console.error("❌ Brick error:", error);
+                this.showNotification("Error en el Brick", "error");
+              },
+            },
+          }
+        );
+      } catch (err) {
+        console.error("❌ Error al cargar el Brick:", err);
+        this.showNotification(
+          "No se pudo cargar el formulario de pago.",
           "error"
         );
       }

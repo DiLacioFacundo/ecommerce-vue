@@ -146,7 +146,7 @@
           id="recomendadosCarousel"
           class="carousel slide"
           data-bs-ride="carousel"
-          data-bs-interval="3500"
+          data-bs-interval="2750"
         >
           <div class="carousel-inner">
             <div

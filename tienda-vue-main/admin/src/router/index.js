@@ -1,6 +1,5 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import store from "../store"; // Asegúrate de que el store esté importado correctamente
 import * as jwtDecode from "jwt-decode";
 
 import LoginApp from "../views/LoginApp.vue";

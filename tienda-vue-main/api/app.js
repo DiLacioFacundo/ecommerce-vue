@@ -1,4 +1,5 @@
 // Importaciones
+require('dotenv').config(); 
 var express = require('express');
 var mongoose = require('mongoose');
 var bodyparser = require('body-parser');
@@ -15,28 +16,30 @@ var venta_router = require('./routes/venta');
 var ecommerce_router = require('./routes/ecommerce');
 var categoria_router = require('./routes/categoria');
 var dashboard_router = require('./routes/dashboard');
+var pago_router = require('./routes/pago');
 
 // Configuración de la aplicación
 var app = express();
 var port = process.env.PORT || 4201;
 
+app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyparser.json({ limit: '50mb', extended: true }));
+
 // Configuración del servidor HTTP y WebSocket
 const httpServer = createServer(app);
-const io = new Server(httpServer, {
-    cors: { origin: '*' },
+const io = new Server(httpServer, { cors: { origin: '*' } });
+
+io.on("connection", (socket) => {
+  console.log(`Cliente conectado: ${socket.id}`);
+  socket.on('emit_method', (data) => {
+    io.emit('semit_method', data);
+    console.log(`Mensaje recibido: ${data}`);
+  });
+  socket.on('disconnect', () => {
+    console.log(`Cliente desconectado: ${socket.id}`);
+  });
 });
 
-// Configuración de WebSocket
-io.on("connection", (socket) => {
-    console.log(`Cliente conectado: ${socket.id}`);
-    socket.on('emit_method', (data) => {
-        io.emit('semit_method', data);
-        console.log(`Mensaje recibido: ${data}`);
-    });
-    socket.on('disconnect', () => {
-        console.log(`Cliente desconectado: ${socket.id}`);
-    });
-});
 
 // Configuración de body-parser
 app.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
@@ -84,6 +87,7 @@ app.use('/api', venta_router);
 app.use('/api', categoria_router);
 app.use('/api', ecommerce_router);
 app.use('/api', dashboard_router);
+app.use('/api', pago_router);
 
 // Levantar el servidor
 httpServer.listen(port, () => {

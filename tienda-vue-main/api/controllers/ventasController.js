@@ -1,16 +1,8 @@
 const mongoose = require('mongoose');
-const { MercadoPagoConfig, Payment } = require('mercadopago');
 const Venta = require('../models/venta');
 const Venta_Detalle = require('../models/venta_detalle');
 const Direccion = require('../models/direccion');
 const Producto = require('../models/producto');
-
-// Configuración del cliente de Mercado Pago
-const mercadopagoConfig = new MercadoPagoConfig({
-    accessToken: 'TEST-461829137274803-121714-422bec9244ce16b08daf3163306bc667-604631426',
-});
-
-const payment = new Payment(mercadopagoConfig);
 
 // Controladores
 const obtener_ventas_admin = async function (req, res) {
@@ -57,67 +49,65 @@ const obtener_ventas_admin = async function (req, res) {
 
         res.status(200).send(ventas);
     } catch (error) {
-        console.error("Error al obtener las ventas:", error);
         res.status(500).send({ message: "Error al obtener ventas." });
     }
 };
 
 const obtener_detalles_venta_admin = async function (req, res) {
     try {
-      const id = req.params.id;
-  
-      if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).send({ message: 'ID de venta no válido' });
-      }
-  
-      // Buscar la venta
-      const venta = await Venta.findById(id).populate('cliente').populate('direccion');
-      if (!venta) {
-        return res.status(404).send({ message: 'Venta no encontrada' });
-      }
-    
-      // Buscar los detalles de la venta
-      let detalles = await Venta_Detalle.find({ venta: id }).populate({
-        path: 'producto',
-        select: 'titulo precio imagenes variantes',
-      });
-  
-      // Para cada detalle, procesar la información incluyendo la primera imagen
-      detalles = detalles.map((detalle) => {
-        const primeraImagen = detalle.producto.imagenes?.[0] || ''; // Obtiene la primera imagen o un string vacío
-        if (detalle.variedad) {
-          const variedadCompleta = detalle.producto.variantes.find(
-            (variedad) => variedad._id.toString() === detalle.variedad.toString()
-          );
-  
-          return {
-            ...detalle.toObject(),
-            producto: {
-              titulo: detalle.producto.titulo,
-              precio: detalle.producto.precio,
-              imagen: primeraImagen, // Incluye la primera imagen
-            },
-            variedad: variedadCompleta || null,
-          };
+        const id = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).send({ message: 'ID de venta no válido' });
         }
-  
-        return {
-          ...detalle.toObject(),
-          producto: {
-            titulo: detalle.producto.titulo,
-            precio: detalle.producto.precio,
-            imagen: primeraImagen, // Incluye la primera imagen
-          },
-        };
-      });
-    
-      res.status(200).send({ venta, detalles });
+
+        // Buscar la venta
+        const venta = await Venta.findById(id).populate('cliente').populate('direccion');
+        if (!venta) {
+            return res.status(404).send({ message: 'Venta no encontrada' });
+        }
+
+        // Buscar los detalles de la venta
+        let detalles = await Venta_Detalle.find({ venta: id }).populate({
+            path: 'producto',
+            select: 'titulo precio imagenes variantes',
+        });
+
+        // Para cada detalle, procesar la información incluyendo la primera imagen
+        detalles = detalles.map((detalle) => {
+            const primeraImagen = detalle.producto.imagenes?.[0] || '';
+            if (detalle.variedad) {
+                const variedadCompleta = detalle.producto.variantes.find(
+                    (variedad) => variedad._id.toString() === detalle.variedad.toString()
+                );
+
+                return {
+                    ...detalle.toObject(),
+                    producto: {
+                        titulo: detalle.producto.titulo,
+                        precio: detalle.producto.precio,
+                        imagen: primeraImagen, // Incluye la primera imagen
+                    },
+                    variedad: variedadCompleta || null,
+                };
+            }
+
+            return {
+                ...detalle.toObject(),
+                producto: {
+                    titulo: detalle.producto.titulo,
+                    precio: detalle.producto.precio,
+                    imagen: primeraImagen, // Incluye la primera imagen
+                },
+            };
+        });
+
+        res.status(200).send({ venta, detalles });
     } catch (error) {
-      console.error('Error al obtener detalles de la venta:', error.message);
-      res.status(500).send({ message: 'Error interno al obtener detalles de la venta' });
+        res.status(500).send({ message: 'Error interno al obtener detalles de la venta' });
     }
-  };
-  
+};
+
 const actualizar_estado_venta = async function (req, res) {
     try {
         const { id, estado } = req.body;
@@ -144,28 +134,30 @@ const actualizar_estado_venta = async function (req, res) {
 
 const guardar_venta = async function (req, res) {
     try {
-        const { cliente, direccion, total, envio, detalles } = req.body;
 
-        // Validar cliente
-        if (!mongoose.Types.ObjectId.isValid(cliente)) {
-            return res.status(400).send({ message: "El ID del cliente no es válido." });
+
+        const clienteId = req.user._id;
+        const { direccion, total, envio, detalles } = req.body;
+
+        // Validar campos mínimos
+        if (!direccion || !detalles || detalles.length === 0 || !total || !envio) {
+            return res.status(400).send({ message: "Datos incompletos para procesar la venta." });
         }
 
-        // Crear dirección
-        const nuevaDireccion = new Direccion({
+        // 1. Guardar dirección
+        const direccionGuardada = await new Direccion({
             nombreCompleto: direccion.nombreCompleto,
             telefono: direccion.telefono,
             pais: direccion.pais,
             ciudad: direccion.ciudad,
             codigoPostal: direccion.codigoPostal,
             direccion: direccion.direccion,
-            cliente: cliente,
-        });
+            cliente: clienteId,
+        }).save();
 
-        const direccionGuardada = await nuevaDireccion.save();
 
-        // Crear venta
-        const nuevaVenta = new Venta({
+        // 2. Crear venta principal
+        const ventaGuardada = await new Venta({
             transaccion: `MP-${Date.now()}`,
             serie: Date.now(),
             year: new Date().getFullYear(),
@@ -173,100 +165,71 @@ const guardar_venta = async function (req, res) {
             day: new Date().getDate(),
             total,
             envio,
-            estado: "Pendiente",
-            cliente: cliente,
+            estado: "Pendiente", // podés actualizarlo luego según el pago
+            cliente: clienteId,
             direccion: direccionGuardada._id,
-        });
+        }).save();
 
-        const ventaGuardada = await nuevaVenta.save();
 
-        // Procesar detalles de la venta
-        const detallesGuardados = await Promise.all(
-            detalles.map(async (detalle) => {
-                // Asegurarse de que los IDs no tengan espacios
-                let productoId = detalle.producto.split("-")[0]; // Obtener solo el ID del producto
-                productoId = productoId.replace(/\s+/g, '_');  // Reemplazar espacios por guiones bajos
+        // 3. Procesar detalles del carrito
+        const detallesGuardados = await Promise.all(detalles.map(async (detalle, index) => {
 
-                // Validar ID del producto
-                if (!mongoose.Types.ObjectId.isValid(productoId)) {
-                    throw new Error(`El ID del producto ${productoId} no es válido.`);
+            const productoId = detalle.producto?.trim();
+            if (!mongoose.Types.ObjectId.isValid(productoId)) {
+                throw new Error(`ID de producto inválido: ${productoId}`);
+            }
+
+            const producto = await Producto.findById(productoId);
+            if (!producto) {
+                throw new Error(`Producto no encontrado: ${productoId}`);
+            }
+
+            let variedadId = null;
+            if (detalle.variedad?.variedad) {
+                const variante = producto.variantes.find(v => v.nombre === detalle.variedad.variedad);
+                if (!variante) throw new Error(`Variante no encontrada: ${detalle.variedad.variedad}`);
+                if (variante.stock < detalle.cantidad) {
+                    throw new Error(`Stock insuficiente para la variante ${variante.nombre}`);
                 }
+                variante.stock -= detalle.cantidad;
+                variedadId = variante._id;
+            }
 
-                // Buscar el producto por ID
-                const producto = await Producto.findById(productoId);
+            if (producto.stock < detalle.cantidad) {
+                throw new Error(`Stock insuficiente para el producto ${producto.titulo}`);
+            }
 
-                if (!producto) {
-                    throw new Error(`Producto con ID ${productoId} no encontrado.`);
-                }
+            producto.stock -= detalle.cantidad;
+            producto.markModified('variantes');
+            await producto.save();
 
-                // Buscar la variante por nombre
-                let variedadId = null;
-                if (detalle.variedad) {
-                    const variante = producto.variantes.find(
-                        (v) => v.nombre === detalle.variedad.variedad
-                    );
-                    if (variante) {
-                        variedadId = variante._id;
+            const subtotal = detalle.cantidad * detalle.precio_unidad;
 
-                        // Descontar stock de la variante
-                        if (variante.stock < detalle.cantidad) {
-                            throw new Error(
-                                `Stock insuficiente para la variante ${variante.nombre} del producto ${producto.titulo}.`
-                            );
-                        }
-                        variante.stock -= detalle.cantidad;
-                    }
-                }
+            const nuevoDetalle = new Venta_Detalle({
+                year: new Date().getFullYear(),
+                month: new Date().getMonth() + 1,
+                day: new Date().getDate(),
+                subtotal,
+                precio_unidad: detalle.precio_unidad,
+                cantidad: detalle.cantidad,
+                venta: ventaGuardada._id,
+                cliente: clienteId,
+                producto: productoId,
+                variedad: variedadId,
+            });
 
-                // Descontar stock total del producto
-                if (producto.stock < detalle.cantidad) {
-                    throw new Error(
-                        `Stock total insuficiente para el producto ${producto.titulo}.`
-                    );
-                }
-                producto.stock -= detalle.cantidad;
+            const detalleGuardado = await nuevoDetalle.save();
+            return detalleGuardado;
+        }));
 
-                // Guardar los cambios en el producto
-                await producto.save();
-
-                // Validar precio y cantidad
-                if (!detalle.precio_unidad || isNaN(detalle.precio_unidad)) {
-                    throw new Error(`El precio del producto ${productoId} no es válido.`);
-                }
-
-                if (!detalle.cantidad || isNaN(detalle.cantidad)) {
-                    throw new Error(`La cantidad del producto ${productoId} no es válida.`);
-                }
-
-                // Calcular subtotal
-                const subtotal = detalle.cantidad * detalle.precio_unidad;
-
-                // Crear y guardar detalle de venta
-                const nuevoDetalle = new Venta_Detalle({
-                    year: new Date().getFullYear(),
-                    month: new Date().getMonth() + 1,
-                    day: new Date().getDate(),
-                    subtotal,
-                    precio_unidad: detalle.precio_unidad,
-                    cantidad: detalle.cantidad,
-                    venta: ventaGuardada._id, // Relacionar el detalle con la venta
-                    cliente: cliente,
-                    producto: productoId, // Usar el ID del producto corregido
-                    variedad: variedadId || null, // Usar el ID de la variante (puede ser null)
-                });
-
-                return await nuevoDetalle.save();
-            })
-        );
-
-        // Responder con el éxito
+        // 4. Respuesta final
         res.status(200).send({
-            message: "Venta y detalles guardados correctamente.",
+            message: "Venta guardada correctamente.",
             venta: ventaGuardada,
             detalles: detallesGuardados,
         });
+
     } catch (error) {
-        console.error("Error al guardar la venta:", error.message || error);
         res.status(500).send({
             message: "Error al guardar la venta.",
             error: error.message || error,
