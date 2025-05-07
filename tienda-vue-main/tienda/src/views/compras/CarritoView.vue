@@ -372,18 +372,6 @@ export default {
   align-items: center;
 }
 
-.btn-outline-secondary {
-  font-size: 0.8rem; /* Tamaño más pequeño */
-  padding: 0.25rem 0.5rem; /* Padding reducido */
-  transition: all 0.2s ease-in-out;
-}
-
-.btn-outline-secondary:hover {
-  background-color: #007bff;
-  color: #fff;
-  border-color: #007bff;
-}
-
 /* Centra el contenido de las columnas */
 .cart-header .col,
 .cart-item .col {

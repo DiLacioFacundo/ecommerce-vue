@@ -1,32 +1,45 @@
 const { MercadoPagoConfig, Payment } = require("mercadopago");
 
 const mercadopago = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN,
+  accessToken: process.env.MP_ACCESS_TOKEN, // Asegurate que esté definido en tu .env
 });
 
 const procesar_pago_brick = async (req, res) => {
   try {
+    const { transaction_amount, token, payment_method_id, installments, payer } = req.body;
+
+    // Validaciones básicas
+    if (!transaction_amount || !token || !payment_method_id || !payer?.email) {
+      return res.status(400).json({ message: "Faltan datos obligatorios para procesar el pago." });
+    }
+
     const payment = new Payment(mercadopago);
 
     const result = await payment.create({
       body: {
-        transaction_amount: req.body.transaction_amount,
-        token: req.body.token,
-        payment_method_id: req.body.payment_method_id,
-        installments: req.body.installments,
+        transaction_amount,
+        token,
+        payment_method_id,
+        installments,
         payer: {
-          email: req.body.payer.email,
+          email: payer.email,
+          first_name: payer.first_name || "",
+          last_name: payer.last_name || "",
         },
       },
     });
 
-    console.log("✅ Pago procesado:", result);
-    res.status(200).send(result);
+    res.status(200).json({
+      id: result.id, 
+      status: result.status,
+      status_detail: result.status_detail,
+    });
+
   } catch (error) {
-    console.error("❌ Error al procesar el pago:", error.message);
-    res.status(500).send({
+    console.error("❌ Error al procesar el pago:", error);
+    res.status(500).json({
       message: "Error al procesar el pago",
-      error: error.message,
+      error: error.message || "Error desconocido",
     });
   }
 };

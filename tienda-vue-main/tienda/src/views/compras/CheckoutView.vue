@@ -47,64 +47,133 @@
               <form @submit.prevent="guardarInformacion">
                 <div class="row">
                   <div class="col-md-6 mb-3">
-                    <label class="form-label">Nombre Completo</label>
+                    <label class="form-label">Nombre</label>
                     <input
-                      v-model="nuevaDireccion.nombreCompleto"
+                      v-model="nuevaInformacion.nombre"
                       type="text"
                       class="form-control input-animated"
-                      placeholder="Ingresa tu nombre y apellido"
+                      placeholder="Nombre"
                       required
                     />
                   </div>
                   <div class="col-md-6 mb-3">
+                    <label class="form-label">Apellido</label>
+                    <input
+                      v-model="nuevaInformacion.apellido"
+                      type="text"
+                      class="form-control input-animated"
+                      placeholder="Apellido"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">DNI</label>
+                    <input
+                      v-model="nuevaInformacion.dni"
+                      type="text"
+                      class="form-control input-animated"
+                      placeholder="Ej: 30123456 (sin puntos ni guiones)"
+                      pattern="^\d{7,8}$"
+                      title="Debe ser un número válido de 7 u 8 dígitos"
+                      required
+                    />
+                  </div>
+
+                  <div class="col-md-6 mb-3">
                     <label class="form-label">Teléfono</label>
                     <input
-                      v-model="nuevaDireccion.telefono"
+                      v-model="nuevaInformacion.telefono"
                       type="text"
                       class="form-control input-animated"
                       placeholder="Número de teléfono"
                       required
                     />
                   </div>
+
                   <div class="col-md-6 mb-3">
                     <label class="form-label">Ciudad</label>
                     <input
-                      v-model="nuevaDireccion.ciudad"
+                      v-model="nuevaInformacion.ciudad"
                       type="text"
                       class="form-control input-animated"
                       placeholder="Ciudad"
                       required
                     />
                   </div>
+
                   <div class="col-md-6 mb-3">
                     <label class="form-label">País</label>
                     <input
-                      v-model="nuevaDireccion.pais"
+                      v-model="nuevaInformacion.pais"
                       type="text"
                       class="form-control input-animated"
                       placeholder="País"
                       required
                     />
                   </div>
-                  <div class="col-md-9 mb-3">
-                    <label class="form-label">Dirección</label>
+
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Barrio</label>
                     <input
-                      v-model="nuevaDireccion.direccion"
+                      v-model="nuevaInformacion.barrio"
                       type="text"
                       class="form-control input-animated"
-                      placeholder="Dirección completa"
+                      placeholder="Barrio"
+                    />
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Calle</label>
+                    <input
+                      v-model="nuevaInformacion.calle"
+                      type="text"
+                      class="form-control input-animated"
+                      placeholder="Ej: Av. Siempre Viva"
                       required
                     />
                   </div>
+
                   <div class="col-md-3 mb-3">
-                    <label class="form-label">Codigo Postal</label>
+                    <label class="form-label">Número</label>
                     <input
-                      v-model="nuevaDireccion.codigoPostal"
-                      type="text"
+                      v-model="nuevaInformacion.numero"
+                      type="number"
                       class="form-control input-animated"
-                      placeholder="Codigo Postal"
+                      placeholder="1234"
                       required
                     />
+                  </div>
+
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label">Código Postal</label>
+                    <input
+                      v-model="nuevaInformacion.codigoPostal"
+                      type="text"
+                      class="form-control input-animated"
+                      placeholder="Código Postal"
+                      required
+                    />
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Información Adicional</label>
+                    <input
+                      v-model="nuevaInformacion.informacionAdicional"
+                      type="text"
+                      class="form-control input-animated"
+                      placeholder="Ej: Piso 2, Depto B, Casa fondo"
+                    />
+                  </div>
+
+                  <!-- Botón de actualizar, solo visible si modoActualizarDireccion es true -->
+                  <div v-if="modoActualizarDireccion" class="text-end">
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-sm"
+                      @click="actualizarInformacionEnBrick"
+                    >
+                      Actualizar Información
+                    </button>
                   </div>
                 </div>
               </form>
@@ -158,7 +227,8 @@
 
           <!-- Columna Derecha -->
           <div class="col-lg-4">
-            <div class="block p-4 shadow rounded">
+            <!-- Tu resumen local solo se ve si mostrarResumenLocal es true -->
+            <div v-if="mostrarResumenLocal" class="block p-4 shadow rounded">
               <h5 class="text-uppercase mb-4">Resumen del Pedido</h5>
               <ul class="list-unstyled mb-4">
                 <li class="d-flex justify-content-between mb-2">
@@ -176,10 +246,14 @@
                 </li>
               </ul>
               <button class="btn btn-secondary w-100" @click="onPagarClick">
-                <i class="fas fa-credit-card me-2"></i> Pagar con Mercado Pago
+                <i class="fas fa-credit-card me-2"></i> Confirmar Compra
               </button>
-              <!-- Contenedor del Brick -->
-              <div id="paymentBrick_container" class="mt-4"></div>
+            </div>
+
+            <!-- Este div aparece solo cuando mostrarResumenLocal es false -->
+            <div v-else>
+              <div id="brandBrick_container"></div>
+              <div id="paymentBrick_container"></div>
             </div>
           </div>
         </div>
@@ -198,17 +272,17 @@ export default {
     return {
       notificacion: { visible: false, message: "", type: "", duration: 3000 },
       paymentBrickController: null,
-      direcciones: [],
       productos: [],
       total: 0,
       envio: 10,
-      nuevaDireccion: {},
-      venta: { direccion: null },
+      nuevaInformacion: {},
+      mostrarResumenLocal: true,
+      modoActualizarDireccion: false,
     };
   },
   computed: {
     currentUser() {
-      return this.$store.getters.currentUser || null; // Acceder al getter de Vuex
+      return this.$store.getters.currentUser || null;
     },
   },
   mounted() {
@@ -219,122 +293,140 @@ export default {
       return currency_formatter.format(value, { code: "USD" });
     },
     processImageUrl(imageUrl) {
-      if (!imageUrl) {
-        return "/assets/images/no_image.png";
-      }
-
-      if (imageUrl.startsWith("http")) {
-        return imageUrl;
-      }
-
-      return `${this.$url.replace(/\/api$/, "")}${imageUrl}`;
+      if (!imageUrl) return "/assets/images/no_image.png";
+      return imageUrl.startsWith("http")
+        ? imageUrl
+        : `${this.$url.replace(/\/api$/, "")}${imageUrl}`;
     },
     validateDireccion(direccion) {
-      if (
-        !direccion.nombreCompleto ||
-        !direccion.telefono ||
-        !direccion.ciudad ||
-        !direccion.pais ||
-        !direccion.direccion ||
-        !direccion.codigoPostal
-      ) {
-        throw new Error(
-          "Por favor, completa todos los campos de la dirección."
-        );
+      const campos = [
+        "nombre",
+        "apellido",
+        "dni",
+        "telefono",
+        "ciudad",
+        "barrio",
+        "pais",
+        "calle",
+        "numero",
+        "codigoPostal",
+      ];
+      for (const campo of campos) {
+        if (!direccion[campo]) {
+          throw new Error(
+            "Por favor, completa todos los campos de la dirección."
+          );
+        }
       }
     },
     initCarrito() {
       const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-      console.log("Carrito recuperado:", carrito);
+      this.productos = carrito.map((item) => {
+        const producto = item.producto || {
+          titulo: "Producto no disponible",
+          precio: 0,
+          variantes: [],
+        };
+        const variante =
+          producto.variantes?.find(
+            (v) => v.nombre === item.varianteSeleccionada
+          ) || null;
+        const image = this.processImageUrl(producto.imagen);
 
-      if (carrito.length > 0) {
-        this.productos = carrito.map((item) => {
-          const producto = item.producto || {
-            titulo: "Producto no disponible",
-            precio: 0,
-            variantes: [],
-          };
-
-          // Verifica si el producto tiene variantes antes de intentar acceder a ellas
-          let varianteSeleccionada = null;
-          if (producto.variantes && producto.variantes.length > 0) {
-            varianteSeleccionada = producto.variantes.find(
-              (v) => v.nombre === item.varianteSeleccionada
-            );
-          }
-
-          // Procesar imagen utilizando la función processImageUrl
-          const image =
-            this.processImageUrl(producto.imagen) ||
-            "/assets/images/no_image.png";
-
-          return {
-            producto: producto,
-            image: image, // Aquí asignamos la imagen procesada
-            cantidad: item.cantidad || 1,
-            variedad: varianteSeleccionada
-              ? {
-                  _id: varianteSeleccionada._id,
-                  variedad: varianteSeleccionada.nombre,
-                  precio: varianteSeleccionada.precio,
-                }
-              : {
-                  _id: null,
-                  variedad: item.varianteSeleccionada || "Base",
-                  precio: producto.precio || 0,
-                },
-          };
-        });
-
-        // Calcular el total sumando el precio de la variante o del producto base
-        this.total = this.productos.reduce(
-          (acc, item) =>
-            acc +
-            (item.variedad.precio || item.producto.precio || 0) * item.cantidad,
-          0
-        );
-
-        this.showNotification("Carrito cargado correctamente.", "info");
-      } else {
-        this.productos = [];
-        this.total = 0;
-        this.showNotification("El carrito está vacío.", "warning");
-      }
-
-      console.log("Productos procesados con variantes:", this.productos);
+        return {
+          producto,
+          image,
+          cantidad: item.cantidad || 1,
+          variedad: variante
+            ? {
+                _id: variante._id,
+                variedad: variante.nombre,
+                precio: variante.precio,
+              }
+            : {
+                _id: null,
+                variedad: item.varianteSeleccionada || "Base",
+                precio: producto.precio || 0,
+              },
+        };
+      });
+      this.total = this.productos.reduce(
+        (acc, item) =>
+          acc + (item.variedad.precio || item.producto.precio) * item.cantidad,
+        0
+      );
     },
-    async loadMercadoPagoSdk() {
-      if (!window.MercadoPago) {
-        await new Promise((resolve, reject) => {
-          const script = document.createElement("script");
-          script.src = "https://sdk.mercadopago.com/js/v2";
-          script.async = true;
-          script.onload = resolve;
-          script.onerror = reject;
-          document.head.appendChild(script);
-        });
-      }
-    },
-
     async onPagarClick() {
       try {
-        this.validateDireccion(this.nuevaDireccion);
-        this.venta.direccion = this.nuevaDireccion;
+        this.validateDireccion(this.nuevaInformacion);
+        this.mostrarResumenLocal = false;
+
         this.showNotification(
           "Dirección validada. Mostrando medios de pago...",
           "success"
         );
-        await this.renderPaymentBrick();
+
+        // Esperá que el DOM actualice y muestre el contenedor
+        this.$nextTick(() => {
+          this.renderBrandBrick();
+          this.renderPaymentBrick();
+        });
       } catch (error) {
         this.showNotification(error.message, "error");
       }
     },
+
+    async renderBrandBrick() {
+      try {
+        const mp = new window.MercadoPago(
+          "APP_USR-28a3eae6-5e1e-493f-93f0-959729f573e9",
+          { locale: "es-AR" }
+        );
+
+        const bricksBuilder = mp.bricks();
+
+        await bricksBuilder.create("brand", "brandBrick_container", {
+          customization: {
+            texts: {
+              valueProp: "payment_methods",
+              align: "left",
+              useCustomFont: false,
+              size: "medium",
+              fontWeight: "semibold",
+              color: "secondary",
+            },
+            paymentMethods: {
+              excludedPaymentMethods: [],
+              excludedPaymentTypes: [],
+              maxInstallments: 12,
+              interestFreeInstallments: false,
+            },
+            visual: {
+              backgroundColor: "white",
+              hideMercadoPagoLogo: false,
+              border: false,
+              borderColor: "dark",
+              contentAlign: "center",
+              borderWidth: "1px",
+              borderRadius: "0px",
+              verticalPadding: "8px",
+              horizontalPadding: "16px",
+            },
+          },
+          callbacks: {
+            onReady: () => {
+              console.log("✅ Brand Brick listo");
+            },
+          },
+        });
+      } catch (error) {
+        console.error("❌ Error al renderizar Brand Brick:", error);
+      }
+    },
     async renderPaymentBrick() {
       try {
-        await this.loadMercadoPagoSdk();
-
         const mp = new window.MercadoPago(
-          "TEST-ea30bf4a-b65c-4d1f-b2c9-b76067e9230a",
+          "APP_USR-28a3eae6-5e1e-493f-93f0-959729f573e9",
           {
             locale: "es-AR",
           }
@@ -342,74 +434,158 @@ export default {
 
         const bricksBuilder = mp.bricks();
 
-        if (this.paymentBrickController) {
-          await this.paymentBrickController.destroy(); // ✅ evita múltiples renders
-        }
-
         this.paymentBrickController = await bricksBuilder.create(
           "payment",
           "paymentBrick_container",
           {
             initialization: {
-              amount: Number(this.total) + Number(this.envio),
+              amount: Number(this.total + this.envio),
+              items: {
+                totalItemsAmount: Number(this.total),
+                itemsList: this.productos.map((item) => ({
+                  units: Number(item.cantidad || 1),
+                  value: Number(
+                    item.variedad.precio || item.producto.precio || 0
+                  ),
+                  name: String(item.producto.titulo || "Sin nombre"),
+                  description: String(item.producto.descripcion || ""),
+                  imageURL: String(item.image || ""),
+                })),
+              },
+              billing: {
+                firstName: String(this.nuevaInformacion.nombre || ""),
+                lastName: String(this.nuevaInformacion.apellido || ""),
+                taxIdentificationNumber: String(
+                  this.nuevaInformacion.dni || ""
+                ),
+                identification: {
+                  type: "DNI",
+                  number: String(this.nuevaInformacion.dni || ""),
+                },
+                billingAddress: {
+                  streetName: String(this.nuevaInformacion.calle || ""),
+                  streetNumber: String(this.nuevaInformacion.numero || ""),
+                  neighborhood: String(this.nuevaInformacion.barrio || ""),
+                  city: String(this.nuevaInformacion.ciudad || ""),
+                  federalUnit: String(this.nuevaInformacion.pais || ""),
+                  zipCode: String(this.nuevaInformacion.codigoPostal || ""),
+                },
+              },
               payer: {
-                email: "test_user_1023024555@testuser.com",
-                firstName: "Test",
-                lastName: "User",
                 entityType: "individual",
+                email: String(
+                  this.currentUser?.email || "test_user@example.com"
+                ),
+                firstName: String(this.nuevaInformacion.nombre || ""),
+                lastName: String(this.nuevaInformacion.apellido || ""),
               },
             },
             customization: {
-              visual: { style: { theme: "default" } },
+              enableReviewStep: true,
+              reviewCardsOrder: ["payment_method", "billing"],
               paymentMethods: {
                 creditCard: "all",
                 debitCard: "all",
                 ticket: "all",
-                bankTransfer: "all",
-                atm: "all",
-                wallet_purchase: "all",
                 maxInstallments: 12,
               },
             },
             callbacks: {
               onReady: () => console.log("✅ Brick listo"),
+              onReadyReview: () => console.log("📝 Paso de revisión listo"),
+              onClickEditBillingData: async () => {
+                const confirm = window.confirm(
+                  "¿Querés modificar los datos de facturación?"
+                );
+                if (!confirm) return;
+                this.modoActualizarDireccion = true;
+                this.showNotification(
+                  "Actualizá los datos y presioná 'Actualizar Información'.",
+                  "info"
+                );
+              },
               onSubmit: async ({ selectedPaymentMethod, formData }) => {
-                // tu lógica de pago
+                try {
+                  const response = await axios.post(
+                    `${this.$url}/pagos/procesar_pago`,
+                    {
+                      ...formData,
+                      metodo: selectedPaymentMethod.type,
+                    }
+                  );
+
+                  localStorage.removeItem("carrito");
+                  this.productos = [];
+                  this.total = 0;
+                  setTimeout(() => this.$router.push("/gracias"), 5000);
+                } catch (err) {
+                  console.error("❌ Error al procesar el pago:", err);
+                  this.showNotification("Error al procesar el pago", "error");
+                }
               },
               onError: (error) => {
-                console.error("❌ Brick error:", error);
-                this.showNotification("Error en el Brick", "error");
+                console.error("❌ Error en Brick:", error);
+                this.showNotification("Error en Brick", "error");
               },
             },
           }
         );
       } catch (err) {
-        console.error("❌ Error al cargar el Brick:", err);
+        console.error("❌ Error al cargar el checkout:", err);
         this.showNotification(
           "No se pudo cargar el formulario de pago.",
           "error"
         );
       }
     },
+    async actualizarInformacionEnBrick() {
+      if (
+        this.paymentBrickController &&
+        typeof this.paymentBrickController.update === "function"
+      ) {
+        try {
+          // Ejecuta update con los nuevos datos
+          await this.paymentBrickController.update({
+            billing: {
+              firstName: this.nuevaInformacion.nombre,
+              lastName: this.nuevaInformacion.apellido,
+              taxIdentificationNumber: this.nuevaInformacion.dni,
+              identification: {
+                type: "DNI",
+                number: this.nuevaInformacion.dni,
+              },
+              billingAddress: {
+                streetName: this.nuevaInformacion.calle,
+                streetNumber: this.nuevaInformacion.numero,
+                neighborhood: this.nuevaInformacion.barrio,
+                city: this.nuevaInformacion.ciudad,
+                federalUnit: this.nuevaInformacion.pais,
+                zipCode: this.nuevaInformacion.codigoPostal,
+              },
+            },
+            payer: {
+              firstName: this.nuevaInformacion.nombre,
+              lastName: this.nuevaInformacion.apellido,
+            },
+          });
+
+          this.showNotification("Datos de facturación actualizados", "success");
+          this.modoActualizarDireccion = false;
+        } catch (error) {
+          console.error("❌ Error al actualizar los datos en el Brick:", error);
+          this.showNotification("No se pudo actualizar el Brick", "error");
+        }
+      } else {
+        console.warn("⚠️ El Brick aún no fue creado o no soporta 'update'");
+        this.showNotification(
+          "El formulario de pago aún no está listo para actualizarse.",
+          "warning"
+        );
+      }
+    },
     showNotification(message, type) {
       this.notificacion = { visible: true, message, type, duration: 3000 };
-      setTimeout(() => {
-        this.notificacion.visible = false;
-      }, 3000);
-    },
-    handleValidationError(error) {
-      console.error("Validation Error:", error.message || error);
-      this.showNotification(
-        error.message || "Ocurrió un error al validar los datos.",
-        "error"
-      );
-    },
-    handleBackendError(error) {
-      const message =
-        (error.response && error.response.data.message) ||
-        "Error al procesar la solicitud. Inténtalo de nuevo.";
-      console.error("Backend Error:", message);
-      this.showNotification(message, "error");
+      setTimeout(() => (this.notificacion.visible = false), 3000);
     },
   },
 };
@@ -461,10 +637,6 @@ export default {
   box-shadow: 0 0 8px rgba(0, 123, 255, 0.8);
   border-color: #007bff;
 }
-.btn-primary {
-  background-color: #007bff;
-}
-
 .cart-item {
   display: flex;
   align-items: center;

@@ -43,18 +43,6 @@ p.lead {
   color: #555;
 }
 
-.btn-success {
-  background-color: #28a745;
-  border-color: #28a745;
-  font-size: 1.2rem;
-  transition: all 0.3s ease-in-out;
-}
-
-.btn-success:hover {
-  background-color: #218838;
-  border-color: #1e7e34;
-  transform: scale(1.05);
-}
 
 .shadow-lg {
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);

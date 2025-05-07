@@ -58,14 +58,15 @@
 /* BTN SUCCESS */
 .btn-success {
   background-color: #28a745;
-  color: #ffffff;
   border-color: #28a745;
+  font-size: 1.2rem;
+  transition: all 0.3s ease-in-out;
 }
 
 .btn-success:hover {
-  background-color: #218838; 
-  border-color: #1e7e34; 
-  color: #ffffff; 
+  background-color: #218838;
+  border-color: #1e7e34;
+  transform: scale(1.05);
 }
 
 .btn-success:active {
